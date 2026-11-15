@@ -1,0 +1,7 @@
+## Interface: 16001
+## Title: WeaponSwap
+## Notes: Swaps the main hand between a saved dagger and a saved sword. /ws for help.
+## Version: 1.0.0
+## SavedVariablesPerCharacter: WeaponSwapDB
+
+WeaponSwap.lua
