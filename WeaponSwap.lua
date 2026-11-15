@@ -111,6 +111,7 @@ local MACROS = {
   { name = "WS Ambush", body = "#showtooltip Ambush\n/equipslot [noequipped:Daggers] 16 %s\n/cast Ambush", fallback = "dagger" },
   { name = "WS Sword", body = "/equipslot [equipped:Daggers] 16 %s", fallback = "sword", iconFrom = "sword" },
   { name = "WS Sinister", body = "#showtooltip Sinister Strike\n/cast Sinister Strike\n/equipslot [equipped:Daggers] 16 %s", fallback = "sword" },
+  { name = "WS Slice", body = "#showtooltip Slice and Dice\n/cast Slice and Dice\n/equipslot [equipped:Daggers] 16 %s", fallback = "sword" },
 }
 
 local function macroIcon(m)
@@ -223,7 +224,7 @@ end
 
 local function buildWindow()
   window = CreateFrame("Frame", "WeaponSwapFrame", UIParent, "BasicFrameTemplateWithInset")
-  window:SetSize(270, 292)
+  window:SetSize(300, 292)
   window:SetPoint("CENTER")
   window:Hide() -- frames start shown; /ws toggles it right after building
   window:SetMovable(true)
