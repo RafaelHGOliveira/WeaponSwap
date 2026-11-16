@@ -1,0 +1,71 @@
+<p><img alt="Rogue WeaponSwap" src="https://raw.githubusercontent.com/RafaelHGOliveira/WeaponSwap/main/Media/logo.png" /></p>
+<p><em>Dagger for the opener, sword for the rest of the fight.</em></p>
+<p>On WoW Forever, Backstab and Ambush need a dagger in the main hand. Rogue WeaponSwap keeps a dagger and a sword ready and moves them for you: the dagger goes in when you stealth, the sword comes back after the opener, and one key press swaps in the middle of a fight. You pick the two weapons once by dragging them into a small window. No item names to type, no bags to open.</p>
+<h2>At a glance</h2>
+<ul>
+<li><strong>Opener macros:</strong> WS Backstab and WS Ambush put the dagger in, then strike.</li>
+<li><strong>Swap back on the hit:</strong> WS Sinister and WS Slice use Sinister Strike or Slice and Dice and put the sword back on the same press.</li>
+<li><strong>Works in combat:</strong> the macros use the game's own <code>/equipslot</code>, which Forever allows in combat.</li>
+<li><strong>Automatic swaps out of combat:</strong> dagger when you stealth, sword after the opener, when stealth drops, or when the fight ends. Each one is a checkbox.</li>
+<li><strong>Two identical swords:</strong> a main-hand and an off-hand copy of the same sword are fine. The macros pick the copy in your bags, never the one in your off hand.</li>
+<li><strong>Debug log:</strong> one checkbox records swaps, casts and error messages, for bug reports.</li>
+</ul>
+<h2>Getting started</h2>
+<ol>
+<li>Type <code>/ws</code> to open the window.</li>
+<li>Drag your dagger onto the top slot and your sword onto the bottom one.</li>
+<li>Click <strong>Create / update</strong>. This creates five character macros.</li>
+<li>Drag the macro icons from the window onto your action bar.</li>
+<li>Tick the automatic swaps you want.</li>
+</ol>
+<p>The macros keep themselves up to date. When your bags change or you drag in a new weapon, the addon rewrites them as soon as you are out of combat.</p>
+<h2>The macros</h2>
+<table>
+<thead>
+<tr>
+<th>Macro</th>
+<th>One press</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WS Backstab</td>
+<td>dagger in if needed, then Backstab</td>
+</tr>
+<tr>
+<td>WS Ambush</td>
+<td>dagger in if needed, then Ambush</td>
+</tr>
+<tr>
+<td>WS Sinister</td>
+<td>Sinister Strike, then sword back if the dagger is in</td>
+</tr>
+<tr>
+<td>WS Slice</td>
+<td>Slice and Dice, then sword back if the dagger is in</td>
+</tr>
+<tr>
+<td>WS Sword</td>
+<td>sword back</td>
+</tr>
+</tbody>
+</table>
+<p>Backstab and Ambush need the dagger before they can hit. If the sword is in, the first press swaps (which starts the global cooldown) and the next press hits.</p>
+<h2>Slash commands</h2>
+<ul>
+<li><code>/ws</code>: open or close the window (<code>/WS</code> works too)</li>
+<li><code>/ws dagger</code>, <code>/ws sword</code>: equip one, out of combat</li>
+<li><code>/ws debug</code>: turn the debug log on or off</li>
+<li><code>/ws help</code>: list the commands</li>
+</ul>
+<h2>FAQ</h2>
+<p><strong>Why doesn't the sword come back on its own in combat?</strong>
+Forever does not let an addon swap gear in combat by itself. After an opener from stealth it still works, because the game reports the cast a moment before it flags you as in combat. If a mob pulls you first, press WS Sinister or WS Slice, or let "Sword when combat ends" do it.</p>
+<p><strong>WS Backstab looks greyed out while I hold the sword.</strong>
+The game greys out Backstab without a dagger, even though the macro swaps first. Press it anyway: it swaps, and the next press hits. Forever hides your energy value from addons, so the addon cannot recolor the button.</p>
+<p><strong>Something went wrong. What do I send?</strong>
+Tick Debug log, reproduce the problem and <code>/reload</code>. Then attach <code>WTF\Account\&lt;account&gt;\&lt;realm&gt;\&lt;character&gt;\SavedVariables\WeaponSwap.lua</code> to an issue on GitHub.</p>
+<h2>Supported versions</h2>
+<p>WoW Forever (1.60.1). Other Classic clients are untested.</p>
+<h2>Feedback and source</h2>
+<p>Bug reports, ideas and source code: <a href="https://github.com/RafaelHGOliveira/WeaponSwap">github.com/RafaelHGOliveira/WeaponSwap</a>. MIT license.</p>
