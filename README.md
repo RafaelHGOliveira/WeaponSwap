@@ -23,7 +23,11 @@ middle of a fight, one key press swaps for you.
 
 ## Install
 
-1. Download this repository (or a release zip).
+Get it from [CurseForge](https://www.curseforge.com/wow/addons/rogue-weaponswap)
+with the CurseForge app, or by hand:
+
+1. Download the zip from [CurseForge](https://www.curseforge.com/wow/addons/rogue-weaponswap)
+   (or this repository).
 2. Copy the `WeaponSwap` folder to
    `World of Warcraft\_forever_\Interface\AddOns\WeaponSwap`.
 3. Log in, or `/reload` if you are already in game.
