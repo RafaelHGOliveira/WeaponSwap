@@ -51,7 +51,6 @@ with the CurseForge app, or by hand:
 │ ☑ Sword when leaving stealth       │
 │ ☑ Sword when combat ends           │
 │ ☑ Sword after the opener           │
-│ ☐ Pick Pocket before Ambush (macro)│
 │ ☐ Debug log (/reload saves it)     │
 └────────────────────────────────────┘
 ```
@@ -72,11 +71,6 @@ All five work in combat. Sinister Strike and Slice and Dice do not need a sword,
 those macros hit first and swap after, on the same press. Backstab and Ambush need the
 dagger first. If the sword is in, the first press swaps and starts the global
 cooldown, and the next press hits.
-
-Tick "Pick Pocket before Ambush" and WS Ambush casts Pick Pocket first. Pick Pocket
-has no global cooldown, so Ambush goes off on the same press. Turn on Auto Loot, or
-the loot window opens. On a target already picked or not humanoid, Pick Pocket just
-shows an error and Ambush still goes off.
 
 ## Automatic swaps
 
