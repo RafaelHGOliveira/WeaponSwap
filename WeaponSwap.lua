@@ -24,7 +24,8 @@ local EMPTY_ICON = "Interface\\PaperDoll\\UI-PaperDoll-Slot-MainHand"
 local GetItemInfo = GetItemInfo or C_Item.GetItemInfo
 local GetItemIcon = GetItemIcon or C_Item.GetItemIconByID
 
--- Debug log: /ws debug toggles it. Lines go only to WeaponSwapDB.log, which
+-- Debug log: /ws debug toggles it. Lines go only to WeaponSwapDB.log (cleared at each
+-- login or /reload), which
 -- the game writes to WTF\...\SavedVariables\WeaponSwap.lua on /reload or logout.
 local LOG_MAX = 2000
 local function log(fmt, ...)
@@ -455,6 +456,9 @@ events:SetScript("OnEvent", function(_, event, arg1, _, spellID)
     if arg1 == "WeaponSwap" then
       WeaponSwapDB = WeaponSwapDB or {}
       WeaponSwapDB.auto = nil -- removed option
+      -- Each session starts a fresh log: the file on disk keeps the previous session
+      -- until the next /reload or logout writes this one.
+      WeaponSwapDB.log = {}
     end
   elseif event == "UPDATE_STEALTH" then
     if IsStealthed() then

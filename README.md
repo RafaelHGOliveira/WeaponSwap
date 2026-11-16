@@ -112,7 +112,7 @@ combat.
 
 Tick Debug log (or type `/ws debug`) and WeaponSwap records combat and stealth
 changes, each swap and the bag slot it came from, casts, failed casts and the red
-error text. It writes nothing to chat. After a `/reload`, the last 2000 lines are in
+error text. It writes nothing to chat. Each login or `/reload` starts a fresh log. After a `/reload`, the previous session (up to 2000 lines) is in
 `WTF\Account\<account>\<realm>\<character>\SavedVariables\WeaponSwap.lua`. Paste them
 in an issue when something goes wrong.
 
