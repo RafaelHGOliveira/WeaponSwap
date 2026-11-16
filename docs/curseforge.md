@@ -1,4 +1,4 @@
-![Rogue WeaponSwap](https://raw.githubusercontent.com/RafaelHGOliveira/WeaponSwap/main/Media/logo.png)
+<p align="center"><img src="https://raw.githubusercontent.com/RafaelHGOliveira/WeaponSwap/main/Media/logo-256.png" width="256" height="256" alt="Rogue WeaponSwap"></p>
 
 *Dagger for the opener, sword for the rest of the fight.*
 
