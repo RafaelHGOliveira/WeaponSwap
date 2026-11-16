@@ -110,7 +110,7 @@ end
 -- the modes apart: the setup is two swords and one dagger.
 local MACROS = {
   { name = "WS Backstab", body = "#showtooltip Backstab\n/equipslot [noequipped:Daggers] 16 %s\n/cast Backstab", fallback = "dagger" },
-  { name = "WS Ambush", body = "#showtooltip Ambush\n/equipslot [noequipped:Daggers] 16 %s\n/cast Ambush", fallback = "dagger" },
+  { name = "WS Ambush", body = "#showtooltip Ambush\n/equipslot [noequipped:Daggers] 16 %s\n/cast Ambush", fallback = "dagger", stealth = true },
   { name = "WS Sword", body = "/equipslot [equipped:Daggers] 16 %s", fallback = "sword", iconFrom = "sword" },
   { name = "WS Sinister", body = "#showtooltip Sinister Strike\n/cast Sinister Strike\n/equipslot [equipped:Daggers] 16 %s", fallback = "sword" },
   { name = "WS Slice", body = "#showtooltip Slice and Dice\n/cast Slice and Dice\n/equipslot [equipped:Daggers] 16 %s", fallback = "sword" },
@@ -136,10 +136,16 @@ local function swapSlot()
   return findInBags(WeaponSwapDB.dagger) or findInBags(WeaponSwapDB.sword)
 end
 
+-- Pick Pocket has no global cooldown (Forever DB2, no SpellCooldowns row), so it goes
+-- off on the same press as the opener after it.
 local function macroBody(m, slot)
-  if slot then return m.body:format(slot) end
+  local body = m.body
+  if m.stealth and WeaponSwapDB.pickPocket then
+    body = body:gsub("\n", "\n/cast Pick Pocket\n", 1)
+  end
+  if slot then return body:format(slot) end
   -- No weapon in the bags: /ws works out of combat only.
-  return (m.body:gsub("/equipslot %b[] 16 %%s", "/ws " .. m.fallback))
+  return (body:gsub("/equipslot %b[] 16 %%s", "/ws " .. m.fallback))
 end
 
 -- Rewrites existing macros whose bag slot changed. Out of combat only.
@@ -190,6 +196,7 @@ local OPTIONS = {
   { key = "swordLeaveStealth", label = "Sword when leaving stealth", now = swordIfNotStealthed },
   { key = "swordAfterCombat", label = "Sword when combat ends", now = swordIfNotStealthed },
   { key = "swordAfterOpener", label = "Sword after the opener" },
+  { key = "pickPocket", label = "Pick Pocket before Ambush (macro)", macros = true },
   { key = "debug", label = "Debug log (/reload saves it)", clearLog = true },
 }
 
@@ -246,7 +253,7 @@ end
 
 local function buildWindow()
   window = CreateFrame("Frame", "WeaponSwapFrame", UIParent, "BasicFrameTemplateWithInset")
-  window:SetSize(300, 292)
+  window:SetSize(300, 316)
   window:SetPoint("CENTER")
   window:Hide() -- frames start shown; /ws toggles it right after building
   window:SetMovable(true)
@@ -337,6 +344,7 @@ local function buildWindow()
     c:SetScript("OnClick", function(self)
       WeaponSwapDB[opt.key] = self:GetChecked() and true or nil
       if opt.clearLog and WeaponSwapDB[opt.key] then WeaponSwapDB.log = {} end
+      if opt.macros then updateMacros() end
       local role = opt.now and WeaponSwapDB[opt.key] and opt.now()
       if role then autoEquip(role) end
     end)
