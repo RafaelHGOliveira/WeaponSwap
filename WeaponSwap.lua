@@ -324,71 +324,6 @@ local function buildWindow()
   end
 end
 
--- Action bar colors ------------------------------------------------------------
--- With the sword in, the game greys out WS Backstab and WS Ambush (no dagger), even
--- though the macro swaps first. Recolor those buttons from energy (and stealth, for
--- Ambush) instead. Only the icon color changes; Blizzard's action bars only.
-
-local OPENERS = { ["WS Backstab"] = "Backstab", ["WS Ambush"] = "Ambush" }
-local ENERGY = Enum and Enum.PowerType and Enum.PowerType.Energy or 3
-local BAR_PREFIXES = { "ActionButton", "MultiBarBottomLeftButton", "MultiBarBottomRightButton",
-  "MultiBarRightButton", "MultiBarLeftButton", "MultiBar5Button", "MultiBar6Button", "MultiBar7Button" }
-local hookedButtons = {}
-
-local function energyCost(spell)
-  local GetCost = (C_Spell and C_Spell.GetSpellPowerCost) or GetSpellPowerCost
-  local costs = GetCost and GetCost(spell)
-  for _, c in ipairs(costs or {}) do
-    if c.type == ENERGY then return c.cost end
-  end
-  return 0
-end
-
--- Returns what it decided, for /ws bars.
-local function recolor(button)
-  local action = button.action
-  if not action or not button.icon or not WeaponSwapDB then return "no action" end
-  if GetActionInfo(action) ~= "macro" then return "not a macro" end
-  local spell = OPENERS[GetActionText(action) or ""]
-  if not spell then return "not WS Backstab/Ambush" end
-  if GetInventoryItemID("player", MAIN_HAND) == WeaponSwapDB.dagger then return "dagger in hand: game colors it" end
-  if spell == "Ambush" and not IsStealthed() then return "Ambush out of stealth: game colors it" end
-  if UnitPower("player", ENERGY) >= energyCost(spell) then
-    button.icon:SetVertexColor(1, 1, 1)
-    return "lit"
-  end
-  button.icon:SetVertexColor(0.5, 0.5, 1) -- the game's "not enough power" color
-  return "not enough energy"
-end
-
-local function hookButtons()
-  for _, prefix in ipairs(BAR_PREFIXES) do
-    for i = 1, 12 do
-      local b = _G[prefix .. i]
-      if b and b.UpdateUsable and not hookedButtons[b] then
-        hooksecurefunc(b, "UpdateUsable", recolor)
-        hookedButtons[b] = true
-      end
-    end
-  end
-end
-
-local function recolorAll()
-  for b in pairs(hookedButtons) do recolor(b) end
-end
-
-local bars = CreateFrame("Frame")
-bars:RegisterEvent("PLAYER_LOGIN")
-bars:RegisterUnitEvent("UNIT_POWER_FREQUENT", "player")
-bars:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
-bars:RegisterEvent("UPDATE_STEALTH")
-bars:RegisterEvent("ACTIONBAR_SLOT_CHANGED")
-bars:SetScript("OnEvent", function(_, event)
-  if event == "PLAYER_LOGIN" then hookButtons() end
-  recolorAll()
-  C_Timer.After(0, recolorAll) -- again after Blizzard's own update for the same event
-end)
-
 -- Slash command ----------------------------------------------------------------
 
 SLASH_WEAPONSWAP1 = "/ws"
@@ -399,36 +334,6 @@ SlashCmdList.WEAPONSWAP = function(input)
   local cmd = input:match("^%s*(%S*)"):lower()
   if cmd == "dagger" or cmd == "sword" then
     equip(cmd)
-  elseif cmd == "bars" then
-    -- Diagnostics for the action bar colors, printed and logged.
-    local n = 0
-    for _ in pairs(hookedButtons) do n = n + 1 end
-    local msg = format("bars: %d hooked; ActionButton1.UpdateUsable=%s; energy=%d", n,
-      tostring(ActionButton1 and ActionButton1.UpdateUsable), UnitPower("player", ENERGY))
-    say(msg) log("%s", msg)
-    for slot = 1, 180 do
-      local kind, id = GetActionInfo(slot)
-      local name = kind == "macro" and GetActionText(slot)
-      if name and OPENERS[name] then
-        local usable, noMana = (C_ActionBar and C_ActionBar.IsUsableAction or IsUsableAction)(slot)
-        msg = format("slot %d: %s (macro %s) cost=%s usable=%s noMana=%s", slot, name, tostring(id),
-          tostring(energyCost(OPENERS[name])), tostring(usable), tostring(noMana))
-        say(msg) log("%s", msg)
-      end
-    end
-    for b in pairs(hookedButtons) do
-      local kind, id = b.action and GetActionInfo(b.action)
-      local name = kind == "macro" and GetActionText(b.action)
-      if name and OPENERS[name] then
-        local r, g, bl = b.icon:GetVertexColor()
-        local why = recolor(b)
-        local r2, g2, b2 = b.icon:GetVertexColor()
-        msg = format("button %s action %d: %s color %.1f %.1f %.1f -> %s -> %.1f %.1f %.1f; mh=%s dagger=%s",
-          b:GetName(), b.action, name, r, g, bl, why, r2, g2, b2,
-          tostring(GetInventoryItemID("player", MAIN_HAND)), tostring(WeaponSwapDB.dagger))
-        say(msg) log("%s", msg)
-      end
-    end
   elseif cmd == "debug" then
     WeaponSwapDB.debug = not WeaponSwapDB.debug or nil
     if WeaponSwapDB.debug then WeaponSwapDB.log = {} end
