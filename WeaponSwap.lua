@@ -348,7 +348,7 @@ local function recolor(button)
   if not action or not button.icon or not WeaponSwapDB then return end
   local kind, id = GetActionInfo(action)
   if kind ~= "macro" then return end
-  local spell = OPENERS[GetMacroInfo(id) or ""]
+  local spell = OPENERS[GetActionText(action) or ""]
   if not spell or GetInventoryItemID("player", MAIN_HAND) == WeaponSwapDB.dagger then return end
   if spell == "Ambush" and not IsStealthed() then return end -- let the game grey it
   if UnitPower("player", ENERGY) >= energyCost(spell) then
@@ -404,7 +404,7 @@ SlashCmdList.WEAPONSWAP = function(input)
     say(msg) log("%s", msg)
     for slot = 1, 180 do
       local kind, id = GetActionInfo(slot)
-      local name = kind == "macro" and GetMacroInfo(id)
+      local name = kind == "macro" and GetActionText(slot)
       if name and OPENERS[name] then
         local usable, noMana = (C_ActionBar and C_ActionBar.IsUsableAction or IsUsableAction)(slot)
         msg = format("slot %d: %s (macro %s) cost=%s usable=%s noMana=%s", slot, name, tostring(id),
@@ -414,7 +414,7 @@ SlashCmdList.WEAPONSWAP = function(input)
     end
     for b in pairs(hookedButtons) do
       local kind, id = b.action and GetActionInfo(b.action)
-      local name = kind == "macro" and GetMacroInfo(id)
+      local name = kind == "macro" and GetActionText(b.action)
       if name and OPENERS[name] then
         local r, g, bl = b.icon:GetVertexColor()
         msg = format("button %s action %d: %s color %.1f %.1f %.1f", b:GetName(), b.action, name, r, g, bl)
