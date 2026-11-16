@@ -15,7 +15,8 @@
 -- in the same bag slot (equipping swaps it with the one coming out), and a bag slot
 -- names one exact copy, which matters with two swords of the same item id. The addon
 -- rewrites the macros with that slot out of combat. The automatic swaps run only out
--- of combat: dagger on entering stealth, sword when combat ends or after a stealth opener.
+-- of combat: dagger on entering stealth, sword when combat ends or after a stealth opener,
+-- and whichever the options want after login, a loading screen or a resurrection.
 
 local MAIN_HAND = 16
 local ROLES = { "dagger", "sword" }
@@ -180,13 +181,31 @@ end
 
 local window, slots, checks
 
+-- now(): the weapon the option wants in the current state, applied when it is ticked
+-- and by settle().
+local function daggerIfStealthed() return IsStealthed() and "dagger" or nil end
+local function swordIfNotStealthed() return not IsStealthed() and "sword" or nil end
 local OPTIONS = {
-  { key = "stealthDagger", label = "Dagger when entering stealth" },
-  { key = "swordLeaveStealth", label = "Sword when leaving stealth" },
-  { key = "swordAfterCombat", label = "Sword when combat ends" },
+  { key = "stealthDagger", label = "Dagger when entering stealth", now = daggerIfStealthed },
+  { key = "swordLeaveStealth", label = "Sword when leaving stealth", now = swordIfNotStealthed },
+  { key = "swordAfterCombat", label = "Sword when combat ends", now = swordIfNotStealthed },
   { key = "swordAfterOpener", label = "Sword after the opener" },
   { key = "debug", label = "Debug log (/reload saves it)", clearLog = true },
 }
+
+-- Puts in the weapon the ticked options want right now: after login, /reload, a
+-- loading screen or a resurrection.
+local function settle()
+  if UnitIsDeadOrGhost("player") then return end
+  for _, opt in ipairs(OPTIONS) do
+    local role = opt.now and WeaponSwapDB[opt.key] and opt.now()
+    if role then
+      autoEquip(role)
+      return
+    end
+  end
+end
+
 -- Stealth openers. Cheap Shot and Garrote do not need the dagger (Wowhead tooltips,
 -- 2026-11-16), but stealth put it in, so the sword comes back after them too.
 local SWAP_BACK_AFTER = { Backstab = true, Ambush = true, ["Cheap Shot"] = true, Garrote = true }
@@ -318,6 +337,8 @@ local function buildWindow()
     c:SetScript("OnClick", function(self)
       WeaponSwapDB[opt.key] = self:GetChecked() and true or nil
       if opt.clearLog and WeaponSwapDB[opt.key] then WeaponSwapDB.log = {} end
+      local role = opt.now and WeaponSwapDB[opt.key] and opt.now()
+      if role then autoEquip(role) end
     end)
     local label = window:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     label:SetPoint("LEFT", c, "RIGHT", 2, 0)
@@ -439,6 +460,9 @@ events:RegisterEvent("UPDATE_STEALTH")
 events:RegisterEvent("PLAYER_REGEN_ENABLED") -- combat ended
 events:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player")
 events:RegisterEvent("BAG_UPDATE_DELAYED") -- bag slots moved: rewrite the macros
+events:RegisterEvent("PLAYER_ENTERING_WORLD") -- login, /reload, loading screens
+events:RegisterEvent("PLAYER_ALIVE") -- resurrected without releasing
+events:RegisterEvent("PLAYER_UNGHOST") -- back from ghost
 events:SetScript("OnEvent", function(_, event, arg1, _, spellID)
   if event == "ADDON_LOADED" then
     if arg1 == "WeaponSwap" then
@@ -461,6 +485,8 @@ events:SetScript("OnEvent", function(_, event, arg1, _, spellID)
     end
   elseif event == "BAG_UPDATE_DELAYED" then
     updateMacros()
+  elseif event == "PLAYER_ENTERING_WORLD" or event == "PLAYER_ALIVE" or event == "PLAYER_UNGHOST" then
+    settle()
   elseif event == "PLAYER_REGEN_ENABLED" then
     updateMacros()
     if WeaponSwapDB.stealthDagger and IsStealthed() then

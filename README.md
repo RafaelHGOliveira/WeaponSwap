@@ -81,6 +81,11 @@ cooldown, and the next press hits.
 | Sword after the opener | Ambush, Backstab, Cheap Shot or Garrote lands from stealth |
 | Sword when combat ends | the fight is over (the dagger instead, if you are still stealthed, e.g. after Vanish) |
 
+After login, `/reload`, a loading screen or a resurrection, and when you tick an
+option, WeaponSwap also puts in the weapon those options want right away: the dagger if
+you are stealthed and "Dagger when entering stealth" is on, the sword if you are not
+stealthed and "Sword when leaving stealth" or "Sword when combat ends" is on.
+
 These only run out of combat, because the game does not let an addon swap gear in
 combat on its own. "Sword after the opener" still fires after an opener from
 stealth: the game reports the cast a moment before it flags you as in combat. If a mob
