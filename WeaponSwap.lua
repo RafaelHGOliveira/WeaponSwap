@@ -343,19 +343,21 @@ local function energyCost(spell)
   return 0
 end
 
+-- Returns what it decided, for /ws bars.
 local function recolor(button)
   local action = button.action
-  if not action or not button.icon or not WeaponSwapDB then return end
-  local kind, id = GetActionInfo(action)
-  if kind ~= "macro" then return end
+  if not action or not button.icon or not WeaponSwapDB then return "no action" end
+  if GetActionInfo(action) ~= "macro" then return "not a macro" end
   local spell = OPENERS[GetActionText(action) or ""]
-  if not spell or GetInventoryItemID("player", MAIN_HAND) == WeaponSwapDB.dagger then return end
-  if spell == "Ambush" and not IsStealthed() then return end -- let the game grey it
+  if not spell then return "not WS Backstab/Ambush" end
+  if GetInventoryItemID("player", MAIN_HAND) == WeaponSwapDB.dagger then return "dagger in hand: game colors it" end
+  if spell == "Ambush" and not IsStealthed() then return "Ambush out of stealth: game colors it" end
   if UnitPower("player", ENERGY) >= energyCost(spell) then
     button.icon:SetVertexColor(1, 1, 1)
-  else
-    button.icon:SetVertexColor(0.5, 0.5, 1) -- the game's "not enough power" color
+    return "lit"
   end
+  button.icon:SetVertexColor(0.5, 0.5, 1) -- the game's "not enough power" color
+  return "not enough energy"
 end
 
 local function hookButtons()
@@ -383,6 +385,7 @@ bars:RegisterEvent("ACTIONBAR_SLOT_CHANGED")
 bars:SetScript("OnEvent", function(_, event)
   if event == "PLAYER_LOGIN" then hookButtons() end
   recolorAll()
+  C_Timer.After(0, recolorAll) -- again after Blizzard's own update for the same event
 end)
 
 -- Slash command ----------------------------------------------------------------
@@ -417,7 +420,11 @@ SlashCmdList.WEAPONSWAP = function(input)
       local name = kind == "macro" and GetActionText(b.action)
       if name and OPENERS[name] then
         local r, g, bl = b.icon:GetVertexColor()
-        msg = format("button %s action %d: %s color %.1f %.1f %.1f", b:GetName(), b.action, name, r, g, bl)
+        local why = recolor(b)
+        local r2, g2, b2 = b.icon:GetVertexColor()
+        msg = format("button %s action %d: %s color %.1f %.1f %.1f -> %s -> %.1f %.1f %.1f; mh=%s dagger=%s",
+          b:GetName(), b.action, name, r, g, bl, why, r2, g2, b2,
+          tostring(GetInventoryItemID("player", MAIN_HAND)), tostring(WeaponSwapDB.dagger))
         say(msg) log("%s", msg)
       end
     end
