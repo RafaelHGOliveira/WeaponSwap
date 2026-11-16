@@ -26,7 +26,7 @@ local GetItemIcon = GetItemIcon or C_Item.GetItemIconByID
 
 -- Debug log: /ws debug toggles it. Lines go only to WeaponSwapDB.log, which
 -- the game writes to WTF\...\SavedVariables\WeaponSwap.lua on /reload or logout.
-local LOG_MAX = 500
+local LOG_MAX = 2000
 local function log(fmt, ...)
   if not (WeaponSwapDB and WeaponSwapDB.debug) then return end
   local mh = GetInventoryItemLink("player", 16)
@@ -481,7 +481,6 @@ debug:RegisterEvent("PLAYER_REGEN_ENABLED")
 debug:RegisterEvent("UPDATE_STEALTH")
 debug:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
 debug:RegisterEvent("UI_ERROR_MESSAGE")
-debug:RegisterEvent("ITEM_LOCK_CHANGED")
 debug:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player")
 debug:RegisterUnitEvent("UNIT_SPELLCAST_FAILED", "player")
 debug:SetScript("OnEvent", function(_, event, a, b, c)
