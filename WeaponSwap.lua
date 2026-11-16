@@ -323,6 +323,68 @@ local function buildWindow()
   end
 end
 
+-- Action bar colors ------------------------------------------------------------
+-- With the sword in, the game greys out WS Backstab and WS Ambush (no dagger), even
+-- though the macro swaps first. Recolor those buttons from energy (and stealth, for
+-- Ambush) instead. Only the icon color changes; Blizzard's action bars only.
+
+local OPENERS = { ["WS Backstab"] = "Backstab", ["WS Ambush"] = "Ambush" }
+local ENERGY = Enum and Enum.PowerType and Enum.PowerType.Energy or 3
+local BAR_PREFIXES = { "ActionButton", "MultiBarBottomLeftButton", "MultiBarBottomRightButton",
+  "MultiBarRightButton", "MultiBarLeftButton", "MultiBar5Button", "MultiBar6Button", "MultiBar7Button" }
+local hookedButtons = {}
+
+local function energyCost(spell)
+  local GetCost = (C_Spell and C_Spell.GetSpellPowerCost) or GetSpellPowerCost
+  local costs = GetCost and GetCost(spell)
+  for _, c in ipairs(costs or {}) do
+    if c.type == ENERGY then return c.cost end
+  end
+  return 0
+end
+
+local function recolor(button)
+  local action = button.action
+  if not action or not button.icon or not WeaponSwapDB then return end
+  local kind, id = GetActionInfo(action)
+  if kind ~= "macro" then return end
+  local spell = OPENERS[GetMacroInfo(id) or ""]
+  if not spell or GetInventoryItemID("player", MAIN_HAND) == WeaponSwapDB.dagger then return end
+  if spell == "Ambush" and not IsStealthed() then return end -- let the game grey it
+  if UnitPower("player", ENERGY) >= energyCost(spell) then
+    button.icon:SetVertexColor(1, 1, 1)
+  else
+    button.icon:SetVertexColor(0.5, 0.5, 1) -- the game's "not enough power" color
+  end
+end
+
+local function hookButtons()
+  for _, prefix in ipairs(BAR_PREFIXES) do
+    for i = 1, 12 do
+      local b = _G[prefix .. i]
+      if b and b.UpdateUsable and not hookedButtons[b] then
+        hooksecurefunc(b, "UpdateUsable", recolor)
+        hookedButtons[b] = true
+      end
+    end
+  end
+end
+
+local function recolorAll()
+  for b in pairs(hookedButtons) do recolor(b) end
+end
+
+local bars = CreateFrame("Frame")
+bars:RegisterEvent("PLAYER_LOGIN")
+bars:RegisterUnitEvent("UNIT_POWER_FREQUENT", "player")
+bars:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
+bars:RegisterEvent("UPDATE_STEALTH")
+bars:RegisterEvent("ACTIONBAR_SLOT_CHANGED")
+bars:SetScript("OnEvent", function(_, event)
+  if event == "PLAYER_LOGIN" then hookButtons() end
+  recolorAll()
+end)
+
 -- Slash command ----------------------------------------------------------------
 
 SLASH_WEAPONSWAP1 = "/ws"
