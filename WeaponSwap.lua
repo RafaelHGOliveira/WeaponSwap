@@ -324,6 +324,87 @@ local function buildWindow()
   end
 end
 
+-- Energy glow ------------------------------------------------------------------
+-- With the sword in, the game greys out WS Backstab and WS Ambush (no dagger), even
+-- though the macro swaps first. Forever gives addons the player's energy as a secret
+-- value: addon code cannot compare it, but a StatusBar can display it. So each such
+-- button gets a highlight drawn as a status bar running from cost - 1 to cost: the
+-- game fills it (the button lights up) once energy reaches the opener's cost.
+-- Blizzard's action bars only.
+
+local OPENERS = { ["WS Backstab"] = "Backstab", ["WS Ambush"] = "Ambush" }
+local ENERGY = Enum and Enum.PowerType and Enum.PowerType.Energy or 3
+local BAR_PREFIXES = { "ActionButton", "MultiBarBottomLeftButton", "MultiBarBottomRightButton",
+  "MultiBarRightButton", "MultiBarLeftButton", "MultiBar5Button", "MultiBar6Button", "MultiBar7Button" }
+local glows = {} -- button -> status bar
+local glowBroken -- set when the game refuses, so it fails once instead of every tick
+
+local function energyCost(spell)
+  local GetCost = (C_Spell and C_Spell.GetSpellPowerCost) or GetSpellPowerCost
+  local costs = GetCost and GetCost(spell)
+  for _, c in ipairs(costs or {}) do
+    if c.type == ENERGY then return c.cost end
+  end
+end
+
+local function createGlows()
+  for _, prefix in ipairs(BAR_PREFIXES) do
+    for i = 1, 12 do
+      local button = _G[prefix .. i]
+      if button and button.icon and not glows[button] then
+        local bar = CreateFrame("StatusBar", nil, button)
+        bar:SetAllPoints(button.icon)
+        bar:SetFrameLevel(button:GetFrameLevel() + 2)
+        bar:SetStatusBarTexture("Interface\\Buttons\\ButtonHilight-Square")
+        bar:GetStatusBarTexture():SetBlendMode("ADD")
+        bar:Hide()
+        glows[button] = bar
+      end
+    end
+  end
+end
+
+-- Shows the glow on WS Backstab / WS Ambush while the sword is in.
+local function updateGlow(button, bar)
+  local action = button.action
+  local spell = action and GetActionInfo(action) == "macro" and OPENERS[GetActionText(action) or ""]
+  local cost = spell and energyCost(spell)
+  if not cost or not WeaponSwapDB or GetInventoryItemID("player", MAIN_HAND) == WeaponSwapDB.dagger
+      or (spell == "Ambush" and not IsStealthed()) then
+    bar:Hide()
+    return
+  end
+  bar:SetMinMaxValues(cost - 1, cost)
+  bar:SetValue(UnitPower("player", ENERGY))
+  bar:Show()
+end
+
+local function updateGlows()
+  if glowBroken then return end
+  for button, bar in pairs(glows) do
+    local ok, err = pcall(updateGlow, button, bar)
+    if not ok then
+      glowBroken = true
+      for _, b in pairs(glows) do b:Hide() end
+      log("energy glow disabled: %s", tostring(err))
+      return
+    end
+  end
+end
+
+local glowEvents = CreateFrame("Frame")
+glowEvents:RegisterEvent("PLAYER_LOGIN")
+glowEvents:RegisterUnitEvent("UNIT_POWER_FREQUENT", "player")
+glowEvents:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
+glowEvents:RegisterEvent("UPDATE_STEALTH")
+glowEvents:RegisterEvent("ACTIONBAR_SLOT_CHANGED")
+glowEvents:RegisterEvent("ACTIONBAR_PAGE_CHANGED")
+glowEvents:RegisterEvent("UPDATE_BONUS_ACTIONBAR")
+glowEvents:SetScript("OnEvent", function(_, event)
+  if event == "PLAYER_LOGIN" then createGlows() end
+  updateGlows()
+end)
+
 -- Slash command ----------------------------------------------------------------
 
 SLASH_WEAPONSWAP1 = "/ws"
