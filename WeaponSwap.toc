@@ -3,6 +3,7 @@
 ## Notes: Swaps the main hand between a saved dagger and a saved sword. /ws for help.
 ## Version: 1.0.0
 ## IconTexture: Interface\AddOns\WeaponSwap\Media\icon
+## X-Curse-Project-ID: 1809071
 ## SavedVariablesPerCharacter: WeaponSwapDB
 
 WeaponSwap.lua
