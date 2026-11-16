@@ -1,5 +1,7 @@
 # WeaponSwap
 
+<p align="center"><img src="Media/logo.png" width="200" alt="WeaponSwap logo"></p>
+
 A rogue addon for [WoW Forever](https://www.wowhead.com/forever) that keeps a dagger
 in your main hand for the opener and a sword for the rest of the fight. You pick the
 two weapons once; after that, macros and automatic swaps move them in and out.
