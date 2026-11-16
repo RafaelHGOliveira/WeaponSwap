@@ -395,6 +395,32 @@ SlashCmdList.WEAPONSWAP = function(input)
   local cmd = input:match("^%s*(%S*)"):lower()
   if cmd == "dagger" or cmd == "sword" then
     equip(cmd)
+  elseif cmd == "bars" then
+    -- Diagnostics for the action bar colors, printed and logged.
+    local n = 0
+    for _ in pairs(hookedButtons) do n = n + 1 end
+    local msg = format("bars: %d hooked; ActionButton1.UpdateUsable=%s; energy=%d", n,
+      tostring(ActionButton1 and ActionButton1.UpdateUsable), UnitPower("player", ENERGY))
+    say(msg) log("%s", msg)
+    for slot = 1, 180 do
+      local kind, id = GetActionInfo(slot)
+      local name = kind == "macro" and GetMacroInfo(id)
+      if name and OPENERS[name] then
+        local usable, noMana = (C_ActionBar and C_ActionBar.IsUsableAction or IsUsableAction)(slot)
+        msg = format("slot %d: %s (macro %s) cost=%s usable=%s noMana=%s", slot, name, tostring(id),
+          tostring(energyCost(OPENERS[name])), tostring(usable), tostring(noMana))
+        say(msg) log("%s", msg)
+      end
+    end
+    for b in pairs(hookedButtons) do
+      local kind, id = b.action and GetActionInfo(b.action)
+      local name = kind == "macro" and GetMacroInfo(id)
+      if name and OPENERS[name] then
+        local r, g, bl = b.icon:GetVertexColor()
+        msg = format("button %s action %d: %s color %.1f %.1f %.1f", b:GetName(), b.action, name, r, g, bl)
+        say(msg) log("%s", msg)
+      end
+    end
   elseif cmd == "debug" then
     WeaponSwapDB.debug = not WeaponSwapDB.debug or nil
     if WeaponSwapDB.debug then WeaponSwapDB.log = {} end
