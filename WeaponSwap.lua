@@ -15,7 +15,7 @@
 -- in the same bag slot (equipping swaps it with the one coming out), and a bag slot
 -- names one exact copy, which matters with two swords of the same item id. The addon
 -- rewrites the macros with that slot out of combat. The automatic swaps run only out
--- of combat: dagger on entering stealth, sword when combat ends or after Backstab/Ambush.
+-- of combat: dagger on entering stealth, sword when combat ends or after a stealth opener.
 
 local MAIN_HAND = 16
 local ROLES = { "dagger", "sword" }
@@ -184,10 +184,12 @@ local OPTIONS = {
   { key = "stealthDagger", label = "Dagger when entering stealth" },
   { key = "swordLeaveStealth", label = "Sword when leaving stealth" },
   { key = "swordAfterCombat", label = "Sword when combat ends" },
-  { key = "swordAfterOpener", label = "Sword after Backstab / Ambush" },
+  { key = "swordAfterOpener", label = "Sword after the opener" },
   { key = "debug", label = "Debug log (/reload saves it)", clearLog = true },
 }
-local SWAP_BACK_AFTER = { Backstab = true, Ambush = true }
+-- Stealth openers. Cheap Shot and Garrote do not need the dagger (Wowhead tooltips,
+-- 2026-11-16), but stealth put it in, so the sword comes back after them too.
+local SWAP_BACK_AFTER = { Backstab = true, Ambush = true, ["Cheap Shot"] = true, Garrote = true }
 
 local function spellName(id)
   if GetSpellInfo then return (GetSpellInfo(id)) end

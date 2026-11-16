@@ -11,8 +11,14 @@ dagger in when you stealth and brings the sword back right after the opener. In 
 middle of a fight, one key press swaps for you.
 
 ```
- Stealth ──► dagger in ── Ambush ──► sword back ── Sinister Strike, Slice and Dice ...
-              (auto)                  (auto)
+ Stealth ──► dagger in ── opener ──► sword back ── Sinister Strike, Slice and Dice ...
+              (auto)      Ambush       (auto)
+                          Backstab
+                          Cheap Shot
+                          Garrote
+
+ Stealth drops, no fight ──► sword back (auto)
+ Fight ends ──────────────► sword back (auto), or the dagger if you are still stealthed
 ```
 
 ## Install
@@ -40,7 +46,7 @@ middle of a fight, one key press swaps for you.
 │ ☑ Dagger when entering stealth     │
 │ ☑ Sword when leaving stealth       │
 │ ☑ Sword when combat ends           │
-│ ☑ Sword after Backstab / Ambush    │
+│ ☑ Sword after the opener           │
 │ ☐ Debug log (/reload saves it)     │
 └────────────────────────────────────┘
 ```
@@ -68,11 +74,11 @@ cooldown, and the next press hits.
 |---|---|
 | Dagger when entering stealth | you stealth |
 | Sword when leaving stealth | stealth drops without a fight |
-| Sword after Backstab / Ambush | the opener lands from stealth |
-| Sword when combat ends | the fight is over |
+| Sword after the opener | Ambush, Backstab, Cheap Shot or Garrote lands from stealth |
+| Sword when combat ends | the fight is over (the dagger instead, if you are still stealthed, e.g. after Vanish) |
 
 These only run out of combat, because the game does not let an addon swap gear in
-combat on its own. "Sword after Backstab / Ambush" still fires after an opener from
+combat on its own. "Sword after the opener" still fires after an opener from
 stealth: the game reports the cast a moment before it flags you as in combat. If a mob
 pulls you first, it cannot fire. Press WS Sinister or WS Slice then, or let "Sword when
 combat ends" bring the sword back.
