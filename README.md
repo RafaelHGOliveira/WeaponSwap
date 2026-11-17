@@ -36,24 +36,24 @@ with the CurseForge app, or by hand:
 
 1. Type `/ws` to open the window.
 2. Drag your dagger onto the top slot and your sword onto the bottom one.
-3. Click Create / update. This creates five character macros.
+3. Click Create / update. This creates six character macros.
 4. Drag the macro icons next to the button onto your action bar.
 5. Tick the automatic swaps you want.
 
 ```
-┌──────────── WeaponSwap ────────────┐
-│ [D]  Dagger (Backstab / Ambush)    │
-│       Edward's Knife               │
-│ [S]  Sword                         │
-│       Vileblood Scimitar           │
-│ [Create / update] [B][A][S][SS][SD]│
-│ ☑ Dagger when entering stealth     │
-│ ☑ Sword when leaving stealth       │
-│ ☑ Sword when combat ends           │
-│ ☑ Sword after the opener           │
-│ ☐ Pick Pocket before Ambush        │
-│ ☐ Debug log (/reload saves it)     │
-└────────────────────────────────────┘
+┌────────────── WeaponSwap ───────────────┐
+│ [D]  Dagger (Backstab / Ambush)         │
+│       Edward's Knife                    │
+│ [S]  Sword                              │
+│       Vileblood Scimitar                │
+│ [Create / update] [B][A][S][SS][SD][GS] │
+│ ☑ Dagger when entering stealth          │
+│ ☑ Sword when leaving stealth            │
+│ ☑ Sword when combat ends                │
+│ ☑ Sword after the opener                │
+│ ☐ Pick Pocket before Ambush             │
+│ ☐ Debug log (/reload saves it)          │
+└─────────────────────────────────────────┘
 ```
 
 Left-click a slot to equip that weapon, right-click to clear it.
@@ -67,8 +67,9 @@ Left-click a slot to equip that weapon, right-click to clear it.
 | WS Sinister | Sinister Strike, then puts the sword back if the dagger is in |
 | WS Slice | Slice and Dice, then puts the sword back if the dagger is in |
 | WS Sword | puts the sword back |
+| WS Ghostly | puts the dagger in if it is not there, then Ghostly Strike out of stealth; the next presses Ambush while its buff lasts, Backstab after |
 
-All five work in combat. Sinister Strike and Slice and Dice do not need a sword, so
+All six work in combat. Sinister Strike and Slice and Dice do not need a sword, so
 those macros hit first and swap after, on the same press. Backstab and Ambush need the
 dagger first. If the sword is in, the first press swaps and starts the global
 cooldown, and the next press hits.
@@ -78,6 +79,12 @@ on the same press: Pick Pocket has no global cooldown. Ambush still needs you be
 the target; Pick Pocket does not, so from the front only Pick Pocket goes off. On a
 target already robbed or not humanoid, Pick Pocket shows an error and Ambush goes off
 anyway. Turn on Auto Loot.
+
+WS Ghostly is for openers out of stealth. Ghostly Strike (20 s cooldown) makes the next
+Ambush within 7 s skip the Stealth requirement. While Ghostly Strike is on cooldown,
+that line fails and the macro moves on to Ambush; once the buff is gone, Ambush fails
+too and Backstab goes. In stealth it skips Ghostly Strike and goes straight to Ambush.
+Ambush and Backstab still need you behind the target.
 
 ## Automatic swaps
 

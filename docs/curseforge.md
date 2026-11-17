@@ -17,7 +17,7 @@ On WoW Forever, Backstab and Ambush need a dagger in the main hand. Rogue Weapon
 
 1. Type `/ws` to open the window.
 2. Drag your dagger onto the top slot and your sword onto the bottom one.
-3. Click **Create / update**. This creates five character macros.
+3. Click **Create / update**. This creates six character macros.
 4. Drag the macro icons from the window onto your action bar.
 5. Tick the automatic swaps you want.
 
