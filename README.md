@@ -67,7 +67,7 @@ Left-click a slot to equip that weapon, right-click to clear it.
 | WS Sinister | Sinister Strike, then puts the sword back if the dagger is in |
 | WS Slice | Slice and Dice, then puts the sword back if the dagger is in |
 | WS Sword | puts the sword back |
-| WS Ghostly | puts the dagger in if it is not there, then Ghostly Strike out of stealth; the next presses Ambush while its buff lasts, Backstab after |
+| WS Ghostly | Ghostly Strike out of stealth, then puts the dagger in if it is not there; the next presses Ambush while its buff lasts, Backstab after |
 
 All six work in combat. Sinister Strike and Slice and Dice do not need a sword, so
 those macros hit first and swap after, on the same press. Backstab and Ambush need the
@@ -84,7 +84,9 @@ WS Ghostly is for openers out of stealth. Ghostly Strike (20 s cooldown) makes t
 Ambush within 7 s skip the Stealth requirement. While Ghostly Strike is on cooldown,
 that line fails and the macro moves on to Ambush; once the buff is gone, Ambush fails
 too and Backstab goes. In stealth it skips Ghostly Strike and goes straight to Ambush.
-Ambush and Backstab still need you behind the target.
+Ambush and Backstab still need you behind the target. Ghostly Strike goes before the
+swap, so with the sword in it hits for 125% weapon damage instead of the dagger's 180%,
+but it and the swap share one press.
 
 ## Automatic swaps
 

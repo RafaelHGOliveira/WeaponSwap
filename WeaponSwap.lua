@@ -116,7 +116,8 @@ local MACROS = {
   { name = "WS Slice", body = "#showtooltip Slice and Dice\n/cast Slice and Dice\n/equipslot [equipped:Daggers] 16 %s", fallback = "sword" },
   -- Out of stealth: Ghostly Strike lets the next Ambush skip Stealth (7 s). While it is on
   -- cooldown the line fails and Ambush goes; without the buff Ambush fails and Backstab goes.
-  { name = "WS Ghostly", body = "#showtooltip\n/equipslot [noequipped:Daggers] 16 %s\n/cast [nostealth] Ghostly Strike\n/cast Ambush\n/cast Backstab", fallback = "dagger" },
+  -- Ghostly Strike comes before the swap, like WS Sinister, so it and the swap share a press.
+  { name = "WS Ghostly", body = "#showtooltip\n/cast [nostealth] Ghostly Strike\n/equipslot [noequipped:Daggers] 16 %s\n/cast Ambush\n/cast Backstab", fallback = "dagger" },
 }
 
 local function macroIcon(m)
