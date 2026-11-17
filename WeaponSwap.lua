@@ -136,28 +136,14 @@ local function swapSlot()
   return findInBags(WeaponSwapDB.dagger) or findInBags(WeaponSwapDB.sword)
 end
 
--- Pick Pocket before Ambush. "/cast Pick Pocket" then "/cast Ambush" in one press never
--- cast Ambush here (in game 2026-11-16), and Classic players report the same since
--- SoD. So while the target is a humanoid not robbed yet, WS Ambush casts Pick Pocket
--- only, and the addon turns it back into Ambush once Pick Pocket lands or fails: two
--- presses. [nocombat] keeps Ambush on the button after Vanish, where Pick Pocket fails.
-local robbed = {} -- target GUIDs robbed or refused this session
-
-local function wantPickPocket()
-  if not WeaponSwapDB.pickPocket then return false end
-  local ok, want = pcall(function()
-    local guid = UnitGUID("target")
-    return guid and not robbed[guid] and UnitCanAttack("player", "target") and not UnitIsPlayer("target")
-      and not UnitIsDead("target") and UnitCreatureType("target") == "Humanoid"
-  end)
-  return ok and want
-end
-
+-- Pick Pocket before Ambush, on one press: it has no global cooldown, and the debug log
+-- (2026-11-16) shows "/cast Pick Pocket" + "/cast Sap" landing both on the same press.
+-- Ambush still needs you behind the target, Pick Pocket does not. [nocombat] skips it
+-- after Vanish, where it fails.
 local function macroBody(m, slot)
   local body = m.body
-  if m.pickPocket and wantPickPocket() then
-    body = body:gsub("#showtooltip Ambush", "#showtooltip Pick Pocket")
-               :gsub("/cast Ambush", "/cast [nocombat] Pick Pocket; Ambush")
+  if m.pickPocket and WeaponSwapDB.pickPocket then
+    body = body:gsub("\n/cast Ambush", "\n/cast [nocombat] Pick Pocket\n/cast Ambush")
   end
   if slot then return body:format(slot) end
   -- No weapon in the bags: /ws works out of combat only.
@@ -483,8 +469,6 @@ events:RegisterEvent("GET_ITEM_INFO_RECEIVED") -- names load lazily from the ser
 events:RegisterEvent("UPDATE_STEALTH")
 events:RegisterEvent("PLAYER_REGEN_ENABLED") -- combat ended
 events:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player")
-events:RegisterUnitEvent("UNIT_SPELLCAST_FAILED", "player")
-events:RegisterEvent("PLAYER_TARGET_CHANGED") -- Pick Pocket or Ambush on WS Ambush
 events:RegisterEvent("BAG_UPDATE_DELAYED") -- bag slots moved: rewrite the macros
 events:RegisterEvent("PLAYER_ENTERING_WORLD") -- login, /reload, loading screens
 events:RegisterEvent("PLAYER_ALIVE") -- resurrected without releasing
@@ -504,19 +488,11 @@ events:SetScript("OnEvent", function(_, event, arg1, _, spellID)
     elseif WeaponSwapDB.swordLeaveStealth then
       autoEquip("sword") -- skips in combat, e.g. after an opener
     end
-  elseif (event == "UNIT_SPELLCAST_SUCCEEDED" or event == "UNIT_SPELLCAST_FAILED")
-      and spellName(spellID) == "Pick Pocket" then
-    -- Robbed, or refused (no pockets, already robbed): the next press is Ambush.
-    pcall(function() robbed[UnitGUID("target")] = true end)
-    log("%s Pick Pocket: WS Ambush back to Ambush", event)
-    updateMacros()
   elseif event == "UNIT_SPELLCAST_SUCCEEDED" then
     -- autoEquip skips in combat (Forever blocks it there); swordAfterCombat covers that.
     if WeaponSwapDB.swordAfterOpener and SWAP_BACK_AFTER[spellName(spellID) or ""] then
       autoEquip("sword")
     end
-  elseif event == "PLAYER_TARGET_CHANGED" then
-    if WeaponSwapDB.pickPocket then updateMacros() end
   elseif event == "BAG_UPDATE_DELAYED" then
     updateMacros()
   elseif event == "PLAYER_ENTERING_WORLD" or event == "PLAYER_ALIVE" or event == "PLAYER_UNGHOST" then

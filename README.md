@@ -73,12 +73,11 @@ those macros hit first and swap after, on the same press. Backstab and Ambush ne
 dagger first. If the sword is in, the first press swaps and starts the global
 cooldown, and the next press hits.
 
-With "Pick Pocket before Ambush" ticked, WS Ambush takes two presses on a humanoid you
-have not robbed yet: the first casts Pick Pocket (the button shows its icon), the
-second casts Ambush. Pick Pocket and Ambush on the same press do not work on this
-client: Ambush never goes off. WeaponSwap rewrites the macro when you change target and
-after Pick Pocket lands or fails, so beasts, players and mobs already robbed get Ambush
-on the first press. In combat (after Vanish) the button casts Ambush. Turn on Auto Loot.
+With "Pick Pocket before Ambush" ticked, WS Ambush casts Pick Pocket and then Ambush
+on the same press: Pick Pocket has no global cooldown. Ambush still needs you behind
+the target; Pick Pocket does not, so from the front only Pick Pocket goes off. On a
+target already robbed or not humanoid, Pick Pocket shows an error and Ambush goes off
+anyway. Turn on Auto Loot.
 
 ## Automatic swaps
 
