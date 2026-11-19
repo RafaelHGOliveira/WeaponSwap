@@ -109,15 +109,18 @@ end
 -- "%s" is the bag slot of the weapon not in the main hand. [equipped:Daggers] tells
 -- the modes apart: the setup is two swords and one dagger.
 local MACROS = {
-  { name = "WS Backstab", body = "#showtooltip Backstab\n/equipslot [noequipped:Daggers] 16 %s\n/cast Ambush\n/cast Backstab", fallback = "dagger" },
+  -- A failed "/cast Ambush" out of stealth stops the macro on Forever (Rafael, 2026-11-18:
+  -- "must be in stealth", no Backstab), so the stealth check is a conditional, not a fallthrough.
+  { name = "WS Backstab", body = "#showtooltip\n/equipslot [noequipped:Daggers] 16 %s\n/cast [stealth] Ambush; Backstab", fallback = "dagger" },
   { name = "WS Ambush", body = "#showtooltip Ambush\n/equipslot [noequipped:Daggers] 16 %s\n/cast Ambush", fallback = "dagger", pickPocket = true },
   { name = "WS Sword", body = "/equipslot [equipped:Daggers] 16 %s", fallback = "sword", iconFrom = "sword" },
   { name = "WS Sinister", body = "#showtooltip Sinister Strike\n/cast Sinister Strike\n/equipslot [equipped:Daggers] 16 %s", fallback = "sword" },
   { name = "WS Slice", body = "#showtooltip Slice and Dice\n/cast Slice and Dice\n/equipslot [equipped:Daggers] 16 %s", fallback = "sword" },
-  -- Out of stealth: Ghostly Strike lets the next Ambush skip Stealth (7 s). While it is on
-  -- cooldown the line fails and Ambush goes; without the buff Ambush fails and Backstab goes.
-  -- Ghostly Strike comes before the swap, like WS Sinister, so it and the swap share a press.
-  { name = "WS Ghostly", body = "#showtooltip\n/cast [nostealth] Ghostly Strike\n/equipslot [noequipped:Daggers] 16 %s\n/cast Ambush\n/cast Backstab", fallback = "dagger" },
+  -- Out of stealth: Ghostly Strike lets the next Ambush skip Stealth (7 s). Macro conditionals
+  -- cannot see the buff, so a cast sequence does it: Ghostly Strike, then Ambush, back to
+  -- Ghostly Strike after 7 s without a press. Ghostly Strike comes before the swap, like
+  -- WS Sinister, so it and the swap share a press. In stealth it is a plain Ambush.
+  { name = "WS Ghostly", body = "#showtooltip\n/cast [stealth] Ambush\n/castsequence [nostealth] reset=7 Ghostly Strike, Ambush\n/equipslot [noequipped:Daggers] 16 %s", fallback = "dagger" },
 }
 
 local function macroIcon(m)

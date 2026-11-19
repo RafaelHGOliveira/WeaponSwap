@@ -62,12 +62,12 @@ Left-click a slot to equip that weapon, right-click to clear it.
 
 | Macro | One press |
 |---|---|
-| WS Backstab | puts the dagger in if it is not there, then Ambush when it can go (stealth or Ghostly Strike), Backstab otherwise |
+| WS Backstab | puts the dagger in if it is not there, then Ambush in stealth, Backstab out of it |
 | WS Ambush | puts the dagger in if it is not there, then Ambush |
 | WS Sinister | Sinister Strike, then puts the sword back if the dagger is in |
 | WS Slice | Slice and Dice, then puts the sword back if the dagger is in |
 | WS Sword | puts the sword back |
-| WS Ghostly | Ghostly Strike out of stealth, then puts the dagger in if it is not there; the next presses Ambush while its buff lasts, Backstab after |
+| WS Ghostly | out of stealth, Ghostly Strike and puts the dagger in, then Ambush on the next press; in stealth, Ambush |
 
 All six work in combat. Sinister Strike and Slice and Dice do not need a sword, so
 those macros hit first and swap after, on the same press. Backstab and Ambush need the
@@ -80,10 +80,15 @@ the target; Pick Pocket does not, so from the front only Pick Pocket goes off. O
 target already robbed or not humanoid, Pick Pocket shows an error and Ambush goes off
 anyway. Turn on Auto Loot.
 
+On Forever a failed `/cast` stops the macro: out of stealth, `/cast Ambush` followed by
+`/cast Backstab` shows "must be in stealth" and Backstab never goes. So WS Backstab picks
+with `[stealth]` instead, and WS Ghostly uses a cast sequence.
+
 WS Ghostly is for openers out of stealth. Ghostly Strike (20 s cooldown) makes the next
-Ambush within 7 s skip the Stealth requirement. While Ghostly Strike is on cooldown,
-that line fails and the macro moves on to Ambush; once the buff is gone, Ambush fails
-too and Backstab goes. In stealth it skips Ghostly Strike and goes straight to Ambush.
+Ambush within 7 s skip the Stealth requirement. Macros cannot check for that buff, so
+the macro is a cast sequence: the first press casts Ghostly Strike, the next Ambush, and
+after 7 s without a press it starts over at Ghostly Strike. While Ghostly Strike is on
+cooldown, the press does nothing; use WS Backstab. In stealth it is a plain Ambush.
 Ambush and Backstab still need you behind the target. Ghostly Strike goes before the
 swap, so with the sword in it hits for 125% weapon damage instead of the dagger's 180%,
 but it and the swap share one press.
