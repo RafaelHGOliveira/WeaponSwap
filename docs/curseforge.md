@@ -35,6 +35,10 @@ The macros keep themselves up to date. When your bags change or you drag in a ne
 
 Backstab and Ambush need the dagger before they can hit. If the sword is in, the first press swaps (which starts the global cooldown) and the next press hits.
 
+## Works with Rogue Poison
+
+[Rogue Poison](https://github.com/RafaelHGOliveira/RoguePoison) is a companion addon. When a weapon has no poison, it shows a bar at the top of the screen with the poisons in your bags, and a click coats that weapon. It reads the dagger and sword saved in WeaponSwap, so it also watches the one waiting in your bags: poison it there and it comes out poisoned at the next swap. Each addon works without the other.
+
 ## Slash commands
 
 - `/ws`: open or close the window (`/WS` works too)
