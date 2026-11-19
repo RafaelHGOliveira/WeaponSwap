@@ -137,7 +137,7 @@ combat.
 
 ## Works with Rogue Poison
 
-Rogue Poison is a companion addon. When a weapon has no poison, it shows a bar at the
+[Rogue Poison](https://github.com/RafaelHGOliveira/RoguePoison) is a companion addon. When a weapon has no poison, it shows a bar at the
 top of the screen with the poisons in your bags, and a click coats that weapon. It
 reads the dagger and sword saved here, so it also watches the one waiting in your bags:
 poison it there, and it comes out poisoned when WeaponSwap swaps it in. Each addon works
