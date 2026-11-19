@@ -114,7 +114,8 @@ local MACROS = {
   { name = "WS Backstab", body = "#showtooltip\n/equipslot [noequipped:Daggers] 16 %s\n/cast [stealth] Ambush; Backstab", fallback = "dagger" },
   { name = "WS Ambush", body = "#showtooltip Ambush\n/equipslot [noequipped:Daggers] 16 %s\n/cast Ambush", fallback = "dagger", pickPocket = true },
   { name = "WS Sword", body = "/equipslot [equipped:Daggers] 16 %s", fallback = "sword", iconFrom = "sword" },
-  { name = "WS Sinister", body = "#showtooltip Sinister Strike\n/cast Sinister Strike\n/equipslot [equipped:Daggers] 16 %s", fallback = "sword" },
+  { name = "WS Sinister", body = "#showtooltip Sinister Strike\n/cast Sinister Strike\n/equipslot [equipped:Daggers] 16 %s", fallback = "sword", startAttack = true },
+  { name = "WS Hemorrhage", body = "#showtooltip Hemorrhage\n/cast Hemorrhage\n/equipslot [equipped:Daggers] 16 %s", fallback = "sword", startAttack = true },
   { name = "WS Slice", body = "#showtooltip Slice and Dice\n/cast Slice and Dice\n/equipslot [equipped:Daggers] 16 %s", fallback = "sword" },
   -- Out of stealth: Ghostly Strike lets the next Ambush skip Stealth (7 s). Macro conditionals
   -- cannot see the buff, so a cast sequence does it: Ghostly Strike, then Ambush, back to
@@ -151,6 +152,10 @@ local function macroBody(m, slot)
   local body = m.body
   if m.pickPocket and WeaponSwapDB.pickPocket then
     body = body:gsub("\n/cast Ambush", "\n/cast [nocombat] Pick Pocket\n/cast Ambush")
+  end
+  -- Before the /cast: a failed /cast stops the macro, and auto attack should start anyway.
+  if m.startAttack and WeaponSwapDB.startAttack then
+    body = body:gsub("\n/cast ", "\n/startattack\n/cast ", 1)
   end
   if slot then return body:format(slot) end
   -- No weapon in the bags: /ws works out of combat only.
@@ -206,6 +211,7 @@ local OPTIONS = {
   { key = "swordAfterCombat", label = "Sword when combat ends", now = swordIfNotStealthed },
   { key = "swordAfterOpener", label = "Sword after the opener" },
   { key = "pickPocket", label = "Pick Pocket before Ambush", macros = true },
+  { key = "startAttack", label = "/startattack in WS Sinister and WS Hemorrhage", macros = true },
   { key = "debug", label = "Debug log (/reload saves it)", clearLog = true },
 }
 
@@ -262,7 +268,7 @@ end
 
 local function buildWindow()
   window = CreateFrame("Frame", "WeaponSwapFrame", UIParent, "BasicFrameTemplateWithInset")
-  window:SetSize(330, 316)
+  window:SetSize(360, 340)
   window:SetPoint("CENTER")
   window:Hide() -- frames start shown; /ws toggles it right after building
   window:SetMovable(true)

@@ -36,24 +36,25 @@ with the CurseForge app, or by hand:
 
 1. Type `/ws` to open the window.
 2. Drag your dagger onto the top slot and your sword onto the bottom one.
-3. Click Create / update. This creates six character macros.
+3. Click Create / update. This creates seven character macros.
 4. Drag the macro icons next to the button onto your action bar.
 5. Tick the automatic swaps you want.
 
 ```
-┌────────────── WeaponSwap ───────────────┐
-│ [D]  Dagger (Backstab / Ambush)         │
-│       Edward's Knife                    │
-│ [S]  Sword                              │
-│       Vileblood Scimitar                │
-│ [Create / update] [B][A][S][SS][SD][GS] │
-│ ☑ Dagger when entering stealth          │
-│ ☑ Sword when leaving stealth            │
-│ ☑ Sword when combat ends                │
-│ ☑ Sword after the opener                │
-│ ☐ Pick Pocket before Ambush             │
-│ ☐ Debug log (/reload saves it)          │
-└─────────────────────────────────────────┘
+┌──────────────── WeaponSwap ─────────────────┐
+│ [D]  Dagger (Backstab / Ambush)             │
+│       Edward's Knife                        │
+│ [S]  Sword                                  │
+│       Vileblood Scimitar                    │
+│ [Create / update] [B][A][S][SS][H][SD][GS]  │
+│ ☑ Dagger when entering stealth              │
+│ ☑ Sword when leaving stealth                │
+│ ☑ Sword when combat ends                    │
+│ ☑ Sword after the opener                    │
+│ ☐ Pick Pocket before Ambush                 │
+│ ☐ /startattack in WS Sinister and WS Hemo…  │
+│ ☐ Debug log (/reload saves it)              │
+└─────────────────────────────────────────────┘
 ```
 
 Left-click a slot to equip that weapon, right-click to clear it.
@@ -65,11 +66,12 @@ Left-click a slot to equip that weapon, right-click to clear it.
 | WS Backstab | puts the dagger in if it is not there, then Ambush in stealth, Backstab out of it |
 | WS Ambush | puts the dagger in if it is not there, then Ambush |
 | WS Sinister | Sinister Strike, then puts the sword back if the dagger is in |
+| WS Hemorrhage | Hemorrhage, then puts the sword back if the dagger is in |
 | WS Slice | Slice and Dice, then puts the sword back if the dagger is in |
 | WS Sword | puts the sword back |
 | WS Ghostly | out of stealth, Ghostly Strike and puts the dagger in, then Ambush on the next press; in stealth, Ambush |
 
-All six work in combat. Sinister Strike and Slice and Dice do not need a sword, so
+All seven work in combat. Sinister Strike, Hemorrhage and Slice and Dice do not need a dagger, so
 those macros hit first and swap after, on the same press. Backstab and Ambush need the
 dagger first. If the sword is in, the first press swaps and starts the global
 cooldown, and the next press hits.
@@ -79,6 +81,11 @@ on the same press: Pick Pocket has no global cooldown. Ambush still needs you be
 the target; Pick Pocket does not, so from the front only Pick Pocket goes off. On a
 target already robbed or not humanoid, Pick Pocket shows an error and Ambush goes off
 anyway. Turn on Auto Loot.
+
+With "/startattack in WS Sinister and WS Hemorrhage" ticked, those two macros start auto
+attack before the strike, so auto attack starts even when the strike fails for lack of
+energy. Hemorrhage hits harder with a dagger on Forever (145% weapon damage instead of
+100%, Wowhead tooltip), but WS Hemorrhage still puts the sword back, like WS Sinister.
 
 On Forever a failed `/cast` stops the macro: out of stealth, `/cast Ambush` followed by
 `/cast Backstab` shows "must be in stealth" and Backstab never goes. So WS Backstab picks
