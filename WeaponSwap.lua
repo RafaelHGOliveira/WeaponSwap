@@ -109,7 +109,7 @@ end
 -- "%s" is the bag slot of the weapon not in the main hand. [equipped:Daggers] tells
 -- the modes apart: the setup is two swords and one dagger.
 local MACROS = {
-  { name = "WS Backstab", body = "#showtooltip Backstab\n/equipslot [noequipped:Daggers] 16 %s\n/cast Backstab", fallback = "dagger" },
+  { name = "WS Backstab", body = "#showtooltip Backstab\n/equipslot [noequipped:Daggers] 16 %s\n/cast Ambush\n/cast Backstab", fallback = "dagger" },
   { name = "WS Ambush", body = "#showtooltip Ambush\n/equipslot [noequipped:Daggers] 16 %s\n/cast Ambush", fallback = "dagger", pickPocket = true },
   { name = "WS Sword", body = "/equipslot [equipped:Daggers] 16 %s", fallback = "sword", iconFrom = "sword" },
   { name = "WS Sinister", body = "#showtooltip Sinister Strike\n/cast Sinister Strike\n/equipslot [equipped:Daggers] 16 %s", fallback = "sword" },

@@ -62,7 +62,7 @@ Left-click a slot to equip that weapon, right-click to clear it.
 
 | Macro | One press |
 |---|---|
-| WS Backstab | puts the dagger in if it is not there, then Backstab |
+| WS Backstab | puts the dagger in if it is not there, then Ambush when it can go (stealth or Ghostly Strike), Backstab otherwise |
 | WS Ambush | puts the dagger in if it is not there, then Ambush |
 | WS Sinister | Sinister Strike, then puts the sword back if the dagger is in |
 | WS Slice | Slice and Dice, then puts the sword back if the dagger is in |
