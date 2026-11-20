@@ -19,7 +19,9 @@
 -- and whichever the options want after login, a loading screen or a resurrection.
 -- With the dagger in the off hand and no weapon in the bags there is no bag slot, and
 -- [equipped:Daggers] is true in either hand, so the macros use "/equipslot 16 <name>":
--- equipping the off-hand weapon in the main hand swaps the two hands.
+-- equipping the off-hand weapon in the main hand swaps the two hands. Not yet confirmed
+-- in game (1.3.1, 2026-11-20): that it swaps in combat, and that pressing it with the
+-- weapon already in the main hand neither errors nor starts the global cooldown.
 
 local MAIN_HAND = 16
 local ROLES = { "dagger", "sword" }

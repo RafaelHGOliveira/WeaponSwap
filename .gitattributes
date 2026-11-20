@@ -1,0 +1,5 @@
+# Kept out of the CurseForge zip (git archive).
+.gitattributes export-ignore
+AGENTS.md export-ignore
+release.ps1 export-ignore
+tests/ export-ignore
