@@ -516,6 +516,7 @@ events:RegisterEvent("UPDATE_STEALTH")
 events:RegisterEvent("PLAYER_REGEN_ENABLED") -- combat ended
 events:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player")
 events:RegisterEvent("BAG_UPDATE_DELAYED") -- bag slots moved: rewrite the macros
+events:RegisterEvent("PLAYER_EQUIPMENT_CHANGED") -- a weapon moved to or from the off hand
 events:RegisterEvent("PLAYER_ENTERING_WORLD") -- login, /reload, loading screens
 events:RegisterEvent("PLAYER_ALIVE") -- resurrected without releasing
 events:RegisterEvent("PLAYER_UNGHOST") -- back from ghost
@@ -539,10 +540,11 @@ events:SetScript("OnEvent", function(_, event, arg1, _, spellID)
     if WeaponSwapDB.swordAfterOpener and SWAP_BACK_AFTER[spellName(spellID) or ""] then
       autoEquip("sword")
     end
-  elseif event == "BAG_UPDATE_DELAYED" then
+  elseif event == "BAG_UPDATE_DELAYED" or event == "PLAYER_EQUIPMENT_CHANGED" then
     updateMacros()
   elseif event == "GET_ITEM_INFO_RECEIVED" then
-    updateMacros() -- the hand-swap macros need the item names
+    -- The hand-swap macros need the item names.
+    if arg1 == WeaponSwapDB.dagger or arg1 == WeaponSwapDB.sword then updateMacros() end
     if window and window:IsShown() then refresh() end
   elseif event == "PLAYER_ENTERING_WORLD" or event == "PLAYER_ALIVE" or event == "PLAYER_UNGHOST" then
     settle()
