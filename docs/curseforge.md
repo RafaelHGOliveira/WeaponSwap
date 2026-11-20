@@ -11,6 +11,7 @@ On WoW Forever, Backstab and Ambush need a dagger in the main hand. Rogue Weapon
 - **Works in combat:** the macros use the game's own `/equipslot`, which Forever allows in combat.
 - **Automatic swaps out of combat:** dagger when you stealth, sword after the opener, when stealth drops, or when the fight ends. Each one is a checkbox.
 - **Two identical swords:** a main-hand and an off-hand copy of the same sword are fine. The macros pick the copy in your bags, never the one in your off hand.
+- **Sword and dagger in both hands:** with the sword in the main hand and the dagger in the off hand, the macros swap your hands instead.
 - **Debug log:** one checkbox records swaps, casts and error messages, for bug reports.
 
 ## Getting started

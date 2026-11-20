@@ -17,6 +17,9 @@
 -- rewrites the macros with that slot out of combat. The automatic swaps run only out
 -- of combat: dagger on entering stealth, sword when combat ends or after a stealth opener,
 -- and whichever the options want after login, a loading screen or a resurrection.
+-- With the dagger in the off hand and no weapon in the bags there is no bag slot, and
+-- [equipped:Daggers] is true in either hand, so the macros use "/equipslot 16 <name>":
+-- equipping the off-hand weapon in the main hand swaps the two hands.
 
 local MAIN_HAND = 16
 local ROLES = { "dagger", "sword" }
@@ -53,6 +56,14 @@ local function cursorEquip(id, slot)
         return true
       end
     end
+  end
+  -- Dagger in the off hand: dropping it on the main hand swaps the two hands.
+  if slot == 16 and GetInventoryItemID("player", 17) == id then
+    log("cursorEquip %s from the off hand", tostring(id))
+    ClearCursor()
+    PickupInventoryItem(17)
+    PickupInventoryItem(16)
+    return true
   end
 end
 
@@ -144,11 +155,22 @@ local function swapSlot()
   return findInBags(WeaponSwapDB.dagger) or findInBags(WeaponSwapDB.sword)
 end
 
+-- Dagger and sword both equipped, one per hand, neither in the bags: the names the
+-- macros equip by. Nil while an item name has not loaded yet.
+local function handNames()
+  local d, s = WeaponSwapDB.dagger, WeaponSwapDB.sword
+  if not d or not s or findInBags(d) or findInBags(s) then return end
+  local mh, oh = GetInventoryItemID("player", 16), GetInventoryItemID("player", 17)
+  if not ((mh == d and oh == s) or (mh == s and oh == d)) then return end
+  local dagger, sword = GetItemInfo(d), GetItemInfo(s)
+  if dagger and sword then return { dagger = dagger, sword = sword } end
+end
+
 -- Pick Pocket before Ambush, on one press: it has no global cooldown, and the debug log
 -- (2026-11-16) shows "/cast Pick Pocket" + "/cast Sap" landing both on the same press.
 -- Ambush still needs you behind the target, Pick Pocket does not. [nocombat] skips it
 -- after Vanish, where it fails.
-local function macroBody(m, slot)
+local function macroBody(m, slot, names)
   local body = m.body
   if m.pickPocket and WeaponSwapDB.pickPocket then
     body = body:gsub("\n/cast Ambush", "\n/cast [nocombat] Pick Pocket\n/cast Ambush")
@@ -158,6 +180,12 @@ local function macroBody(m, slot)
     body = body:gsub("\n/cast ", "\n/startattack\n/cast ", 1)
   end
   if slot then return body:format(slot) end
+  -- One weapon per hand: no conditional, since equipping the weapon already in the main
+  -- hand there changes nothing.
+  local name = names and names[m.fallback]
+  if name then
+    return (body:gsub("/equipslot %b[] 16 %%s", function() return "/equipslot 16 " .. name end))
+  end
   -- No weapon in the bags: /ws works out of combat only.
   return (body:gsub("/equipslot %b[] 16 %%s", "/ws " .. m.fallback))
 end
@@ -165,10 +193,10 @@ end
 -- Rewrites existing macros whose bag slot changed. Out of combat only.
 local function updateMacros()
   if not WeaponSwapDB or InCombatLockdown() then return end
-  local slot = swapSlot()
+  local slot, names = swapSlot(), handNames()
   for _, m in ipairs(MACROS) do
     local index = GetMacroIndexByName(m.name)
-    local body = macroBody(m, slot)
+    local body = macroBody(m, slot, names)
     if index > 0 and select(3, GetMacroInfo(index)) ~= body then
       EditMacro(index, m.name, macroIcon(m), body)
     end
@@ -181,19 +209,24 @@ local function createMacros()
     say("cannot create macros in combat.")
     return
   end
-  local slot = swapSlot()
+  local slot, names = swapSlot(), handNames()
   for _, m in ipairs(MACROS) do
     local index = GetMacroIndexByName(m.name)
+    local body = macroBody(m, slot, names)
     if index > 0 then
-      EditMacro(index, m.name, macroIcon(m), macroBody(m, slot))
-    elseif not CreateMacro(m.name, macroIcon(m), macroBody(m, slot), true) then
+      EditMacro(index, m.name, macroIcon(m), body)
+    elseif not CreateMacro(m.name, macroIcon(m), body, true) then
       say("could not create " .. m.name .. ": character macro slots are full.")
     end
   end
   for _, m in ipairs(MACROS) do
     if m.button then m.button:GetScript("OnShow")(m.button) end
   end
-  if not slot then say("no dagger or spare sword found in your bags; the macros will only swap out of combat.") end
+  if names then
+    say("dagger and sword both equipped: the macros swap your hands.")
+  elseif not slot then
+    say("no dagger or spare sword found in your bags, and they are not one in each hand; the macros will only swap out of combat.")
+  end
   say("macros ready. Drag them from the window to your action bar.")
 end
 
@@ -508,6 +541,9 @@ events:SetScript("OnEvent", function(_, event, arg1, _, spellID)
     end
   elseif event == "BAG_UPDATE_DELAYED" then
     updateMacros()
+  elseif event == "GET_ITEM_INFO_RECEIVED" then
+    updateMacros() -- the hand-swap macros need the item names
+    if window and window:IsShown() then refresh() end
   elseif event == "PLAYER_ENTERING_WORLD" or event == "PLAYER_ALIVE" or event == "PLAYER_UNGHOST" then
     settle()
   elseif event == "PLAYER_REGEN_ENABLED" then

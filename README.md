@@ -142,6 +142,22 @@ and off hand, equipping by name could grab the off-hand one; the bag slot can't.
 your bags change, WeaponSwap rewrites the slot in the macros as soon as you are out of
 combat.
 
+### Sword in the main hand, dagger in the off hand
+
+With only two weapons, one in each hand, there is no bag slot to point at, and
+`[equipped:Daggers]` is true whichever hand holds the dagger. In that setup the macros
+equip by name, with no conditional:
+
+```
+#showtooltip Ambush
+/equipslot 16 Edward's Knife
+/cast Ambush
+```
+
+Putting the off-hand dagger in the main hand swaps the two hands: the sword goes to the
+off hand. WS Sinister and WS Sword equip the sword by name the same way, which swaps
+them back. The automatic swaps and the window's left-click swap the hands too.
+
 ## Works with Rogue Poison
 
 [Rogue Poison](https://github.com/RafaelHGOliveira/RoguePoison) is a companion addon. When a weapon has no poison, it shows a bar at the
@@ -170,8 +186,8 @@ in an issue when something goes wrong.
 ## Compatibility
 
 Built and tested on WoW Forever (interface 16001) in November 2026. It assumes one
-dagger and one or two swords, since `[equipped:Daggers]` is how it tells the two modes
-apart. Other Classic clients may work after bumping the interface number in the
+dagger and one or two swords: the weapon not in the main hand waits in the bags, or
+the dagger and the sword sit one in each hand. Other Classic clients may work after bumping the interface number in the
 `.toc`, but the combat rules above were only checked on Forever.
 
 ## License
