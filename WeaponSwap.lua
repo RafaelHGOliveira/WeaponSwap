@@ -131,12 +131,9 @@ local MACROS = {
   { name = "WS Sinister", body = "#showtooltip Sinister Strike\n/cast Sinister Strike\n/equipslot [equipped:Daggers] 16 %s", fallback = "sword", startAttack = true },
   { name = "WS Hemorrhage", body = "#showtooltip Hemorrhage\n/cast Hemorrhage\n/equipslot [equipped:Daggers] 16 %s", fallback = "sword", startAttack = true },
   { name = "WS Slice", body = "#showtooltip Slice and Dice\n/cast Slice and Dice\n/equipslot [equipped:Daggers] 16 %s", fallback = "sword" },
-  -- Out of stealth: Ghostly Strike lets the next Ambush skip Stealth (7 s). Macro conditionals
-  -- cannot see the buff, so a cast sequence does it: Ghostly Strike, then Ambush, back to
-  -- Ghostly Strike after 7 s without a press. Ghostly Strike comes before the swap, like
-  -- WS Sinister, so it and the swap share a press. In stealth it is a plain Ambush, so its
-  -- /startattack is [nostealth], as in WS Backstab.
-  { name = "WS Ghostly", body = "#showtooltip\n/cast [stealth] Ambush\n/castsequence [nostealth] reset=7 Ghostly Strike, Ambush\n/equipslot [noequipped:Daggers] 16 %s", fallback = "dagger", startAttack = "[nostealth]" },
+  -- Ghostly Strike alone, like WS Sinister: it needs no dagger, so it hits first and puts the
+  -- sword back on the same press. It no longer turns into Ambush (Rafael, 2026-11-21).
+  { name = "WS Ghostly", body = "#showtooltip Ghostly Strike\n/cast Ghostly Strike\n/equipslot [equipped:Daggers] 16 %s", fallback = "sword", startAttack = true },
 }
 
 local function macroIcon(m)

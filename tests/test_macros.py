@@ -114,7 +114,8 @@ assert hand["WS Sword"] == "/equipslot 16 Vileblood Scimitar of the 100% Monkey"
 assert hand["WS Sinister"].endswith("/equipslot 16 Vileblood Scimitar of the 100% Monkey")
 assert "/startattack\n/cast Sinister Strike" in hand["WS Sinister"]
 assert "/equipslot 16 Edward's Knife\n/startattack [nostealth]\n/cast [stealth] Ambush; Backstab" in hand["WS Backstab"]
-assert hand["WS Ghostly"].startswith("#showtooltip\n/startattack [nostealth]\n/cast [stealth] Ambush\n/castsequence")
+assert hand["WS Ghostly"] == "#showtooltip Ghostly Strike\n/startattack\n/cast Ghostly Strike\n/equipslot 16 Vileblood Scimitar of the 100% Monkey"
+assert "Ambush" not in bag_sword["WS Ghostly"] and "[equipped:Daggers] 16 0 7" in bag_sword["WS Ghostly"]
 assert "/startattack" not in hand["WS Slice"]
 assert "/startattack" not in bag_sword["WS Backstab"]
 assert not any("equipped:Daggers" in b for b in hand.values())
