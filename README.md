@@ -52,7 +52,7 @@ with the CurseForge app, or by hand:
 │ ☑ Sword when combat ends                    │
 │ ☑ Sword after the opener                    │
 │ ☐ Pick Pocket before Ambush                 │
-│ ☐ /startattack in WS Backstab, Sinister, H… │
+│ ☐ /startattack in the strike macros         │
 │ ☐ Debug log (/reload saves it)              │
 └─────────────────────────────────────────────┘
 ```
@@ -82,11 +82,12 @@ the target; Pick Pocket does not, so from the front only Pick Pocket goes off. O
 target already robbed or not humanoid, Pick Pocket shows an error and Ambush goes off
 anyway. Turn on Auto Loot.
 
-With "/startattack in WS Backstab, Sinister, Hemorrhage" ticked, those three macros
-start auto attack before the strike, so auto attack starts even when the strike fails for
-lack of energy, or Backstab because you are not behind the target. WS Backstab does it only
-out of stealth (`/startattack [nostealth]`): in stealth a swing would break it before
-Ambush. Hemorrhage hits harder with a dagger on Forever (145% weapon damage instead of
+With "/startattack in the strike macros" ticked, WS Backstab, WS Sinister, WS Hemorrhage
+and WS Ghostly start auto attack before the strike, so auto attack starts even when the
+strike fails for lack of energy, or Backstab because you are not behind the target. WS
+Backstab and WS Ghostly do it only out of stealth (`/startattack [nostealth]`): in stealth
+they cast Ambush, and a swing would break stealth first. WS Slice has none: you use it
+mid-fight, with auto attack already on. Hemorrhage hits harder with a dagger on Forever (145% weapon damage instead of
 100%, Wowhead tooltip), but WS Hemorrhage still puts the sword back, like WS Sinister.
 
 On Forever a failed `/cast` stops the macro: out of stealth, `/cast Ambush` followed by

@@ -134,8 +134,9 @@ local MACROS = {
   -- Out of stealth: Ghostly Strike lets the next Ambush skip Stealth (7 s). Macro conditionals
   -- cannot see the buff, so a cast sequence does it: Ghostly Strike, then Ambush, back to
   -- Ghostly Strike after 7 s without a press. Ghostly Strike comes before the swap, like
-  -- WS Sinister, so it and the swap share a press. In stealth it is a plain Ambush.
-  { name = "WS Ghostly", body = "#showtooltip\n/cast [stealth] Ambush\n/castsequence [nostealth] reset=7 Ghostly Strike, Ambush\n/equipslot [noequipped:Daggers] 16 %s", fallback = "dagger" },
+  -- WS Sinister, so it and the swap share a press. In stealth it is a plain Ambush, so its
+  -- /startattack is [nostealth], as in WS Backstab.
+  { name = "WS Ghostly", body = "#showtooltip\n/cast [stealth] Ambush\n/castsequence [nostealth] reset=7 Ghostly Strike, Ambush\n/equipslot [noequipped:Daggers] 16 %s", fallback = "dagger", startAttack = "[nostealth]" },
 }
 
 local function macroIcon(m)
@@ -248,7 +249,7 @@ local OPTIONS = {
   { key = "swordAfterCombat", label = "Sword when combat ends", now = swordIfNotStealthed },
   { key = "swordAfterOpener", label = "Sword after the opener" },
   { key = "pickPocket", label = "Pick Pocket before Ambush", macros = true },
-  { key = "startAttack", label = "/startattack in WS Backstab, Sinister, Hemorrhage", macros = true },
+  { key = "startAttack", label = "/startattack in the strike macros", macros = true },
   { key = "debug", label = "Debug log (/reload saves it)", clearLog = true },
 }
 
