@@ -124,7 +124,8 @@ end
 local MACROS = {
   -- A failed "/cast Ambush" out of stealth stops the macro on Forever (Rafael, 2026-11-18:
   -- "must be in stealth", no Backstab), so the stealth check is a conditional, not a fallthrough.
-  { name = "WS Backstab", body = "#showtooltip\n/equipslot [noequipped:Daggers] 16 %s\n/cast [stealth] Ambush; Backstab", fallback = "dagger" },
+  -- Its /startattack is [nostealth]: in stealth an auto attack swing would break it before Ambush.
+  { name = "WS Backstab", body = "#showtooltip\n/equipslot [noequipped:Daggers] 16 %s\n/cast [stealth] Ambush; Backstab", fallback = "dagger", startAttack = "[nostealth]" },
   { name = "WS Ambush", body = "#showtooltip Ambush\n/equipslot [noequipped:Daggers] 16 %s\n/cast Ambush", fallback = "dagger", pickPocket = true },
   { name = "WS Sword", body = "/equipslot [equipped:Daggers] 16 %s", fallback = "sword", iconFrom = "sword" },
   { name = "WS Sinister", body = "#showtooltip Sinister Strike\n/cast Sinister Strike\n/equipslot [equipped:Daggers] 16 %s", fallback = "sword", startAttack = true },
@@ -179,7 +180,8 @@ local function macroBody(m, slot, names)
   end
   -- Before the /cast: a failed /cast stops the macro, and auto attack should start anyway.
   if m.startAttack and WeaponSwapDB.startAttack then
-    body = body:gsub("\n/cast ", "\n/startattack\n/cast ", 1)
+    local cond = m.startAttack == true and "" or " " .. m.startAttack
+    body = body:gsub("\n/cast ", "\n/startattack" .. cond .. "\n/cast ", 1)
   end
   if slot then return body:format(slot) end
   -- One weapon per hand: no conditional, since equipping the weapon already in the main
@@ -246,7 +248,7 @@ local OPTIONS = {
   { key = "swordAfterCombat", label = "Sword when combat ends", now = swordIfNotStealthed },
   { key = "swordAfterOpener", label = "Sword after the opener" },
   { key = "pickPocket", label = "Pick Pocket before Ambush", macros = true },
-  { key = "startAttack", label = "/startattack in WS Sinister and WS Hemorrhage", macros = true },
+  { key = "startAttack", label = "/startattack in WS Backstab, Sinister, Hemorrhage", macros = true },
   { key = "debug", label = "Debug log (/reload saves it)", clearLog = true },
 }
 

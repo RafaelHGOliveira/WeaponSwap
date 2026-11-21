@@ -113,6 +113,8 @@ assert hand["WS Ambush"] == "#showtooltip Ambush\n/equipslot 16 Edward's Knife\n
 assert hand["WS Sword"] == "/equipslot 16 Vileblood Scimitar of the 100% Monkey"
 assert hand["WS Sinister"].endswith("/equipslot 16 Vileblood Scimitar of the 100% Monkey")
 assert "/startattack\n/cast Sinister Strike" in hand["WS Sinister"]
+assert "/equipslot 16 Edward's Knife\n/startattack [nostealth]\n/cast [stealth] Ambush; Backstab" in hand["WS Backstab"]
+assert "/startattack" not in bag_sword["WS Backstab"]
 assert not any("equipped:Daggers" in b for b in hand.values())
 
 hand2 = run("hand mode after a swap: dagger MH, sword OH (same bodies)", {}, {16: DAGGER, 17: SWORD}, opts=("pickPocket", "startAttack"))
