@@ -122,10 +122,12 @@ end
 -- "%s" is the bag slot of the weapon not in the main hand. [equipped:Daggers] tells
 -- the modes apart: the setup is two swords and one dagger.
 local MACROS = {
-  -- A failed "/cast Ambush" out of stealth stops the macro on Forever (Rafael, 2026-11-18:
-  -- "must be in stealth", no Backstab), so the stealth check is a conditional, not a fallthrough.
+  -- A failed "/cast Ambush" out of stealth stopped the macro on Forever (Rafael, 2026-11-18:
+  -- "must be in stealth", no Backstab). Retest 2026-11-21: a fallthrough again, so Ambush also
+  -- goes off out of stealth under Ghostly Strike's buff. If Backstab still never goes, go back
+  -- to "/cast [stealth] Ambush; Backstab".
   -- Its /startattack is [nostealth]: in stealth an auto attack swing would break it before Ambush.
-  { name = "WS Backstab", body = "#showtooltip\n/equipslot [noequipped:Daggers] 16 %s\n/cast [stealth] Ambush; Backstab", fallback = "dagger", startAttack = "[nostealth]" },
+  { name = "WS Backstab", body = "#showtooltip\n/equipslot [noequipped:Daggers] 16 %s\n/cast Ambush\n/cast Backstab", fallback = "dagger", startAttack = "[nostealth]" },
   { name = "WS Ambush", body = "#showtooltip Ambush\n/equipslot [noequipped:Daggers] 16 %s\n/cast Ambush", fallback = "dagger", pickPocket = true },
   { name = "WS Sword", body = "/equipslot [equipped:Daggers] 16 %s", fallback = "sword", iconFrom = "sword" },
   { name = "WS Sinister", body = "#showtooltip Sinister Strike\n/cast Sinister Strike\n/equipslot [equipped:Daggers] 16 %s", fallback = "sword", startAttack = true },
