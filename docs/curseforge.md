@@ -6,8 +6,8 @@ On WoW Forever, Backstab and Ambush need a dagger in the main hand. Rogue Weapon
 
 ## At a glance
 
-- **Opener macros:** WS Backstab and WS Ambush put the dagger in, then strike.
-- **Swap back on the hit:** WS Sinister, WS Hemorrhage, WS Slice and WS Ghostly use Sinister Strike, Hemorrhage, Slice and Dice or Ghostly Strike and put the sword back on the same press. One checkbox adds `/startattack` to WS Sinister, WS Hemorrhage, WS Ghostly and, out of stealth, WS Backstab.
+- **Opener macros:** WS Backstab and WS Ambush put the dagger in, then strike. WS Ghostly opens out of stealth with Ghostly Strike, then Ambush.
+- **Swap back on the hit:** WS Sinister, WS Hemorrhage and WS Slice use Sinister Strike, Hemorrhage or Slice and Dice and put the sword back on the same press. One checkbox adds `/startattack` to WS Sinister, WS Hemorrhage and, out of stealth, WS Backstab and WS Ghostly.
 - **Works in combat:** the macros use the game's own `/equipslot`, which Forever allows in combat.
 - **Automatic swaps out of combat:** dagger when you stealth, sword after the opener, when stealth drops, or when the fight ends. Each one is a checkbox.
 - **Two identical swords:** a main-hand and an off-hand copy of the same sword are fine. The macros pick the copy in your bags, never the one in your off hand.
@@ -34,7 +34,7 @@ The macros keep themselves up to date. When your bags change or you drag in a ne
 | WS Hemorrhage | Hemorrhage, then sword back if the dagger is in |
 | WS Slice | Slice and Dice, then sword back if the dagger is in |
 | WS Sword | sword back |
-| WS Ghostly | Ghostly Strike, then sword back if the dagger is in |
+| WS Ghostly | out of stealth: Ghostly Strike and dagger in, then Ambush on the next press |
 
 Backstab and Ambush need the dagger before they can hit. If the sword is in, the first press swaps (which starts the global cooldown) and the next press hits.
 

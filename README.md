@@ -69,9 +69,9 @@ Left-click a slot to equip that weapon, right-click to clear it.
 | WS Hemorrhage | Hemorrhage, then puts the sword back if the dagger is in |
 | WS Slice | Slice and Dice, then puts the sword back if the dagger is in |
 | WS Sword | puts the sword back |
-| WS Ghostly | Ghostly Strike, then puts the sword back if the dagger is in |
+| WS Ghostly | out of stealth, Ghostly Strike and puts the dagger in, then Ambush on the next press; in stealth, Ambush |
 
-All seven work in combat. Sinister Strike, Hemorrhage, Slice and Dice and Ghostly Strike do not need a dagger, so
+All seven work in combat. Sinister Strike, Hemorrhage and Slice and Dice do not need a dagger, so
 those macros hit first and swap after, on the same press. Backstab and Ambush need the
 dagger first. If the sword is in, the first press swaps and starts the global
 cooldown, and the next press hits.
@@ -85,18 +85,23 @@ anyway. Turn on Auto Loot.
 With "/startattack in the strike macros" ticked, WS Backstab, WS Sinister, WS Hemorrhage
 and WS Ghostly start auto attack before the strike, so auto attack starts even when the
 strike fails for lack of energy, or Backstab because you are not behind the target. WS
-Backstab does it only out of stealth (`/startattack [nostealth]`): in stealth it casts
-Ambush, and a swing would break stealth first. WS Slice has none: you use it
+Backstab and WS Ghostly do it only out of stealth (`/startattack [nostealth]`): in stealth
+they cast Ambush, and a swing would break stealth first. WS Slice has none: you use it
 mid-fight, with auto attack already on. Hemorrhage hits harder with a dagger on Forever (145% weapon damage instead of
 100%, Wowhead tooltip), but WS Hemorrhage still puts the sword back, like WS Sinister.
 
 On Forever a failed `/cast` stops the macro: out of stealth, `/cast Ambush` followed by
 `/cast Backstab` shows "must be in stealth" and Backstab never goes. So WS Backstab picks
-with `[stealth]` instead.
+with `[stealth]` instead, and WS Ghostly uses a cast sequence.
 
-WS Ghostly casts Ghostly Strike (20 s cooldown) with whatever is in the main hand, then
-puts the sword back. With the dagger in it hits for 180% weapon damage, with the sword
-125%. Its buff lets the next Ambush within 7 s skip Stealth; the macro does not use it.
+WS Ghostly is for openers out of stealth. Ghostly Strike (20 s cooldown) makes the next
+Ambush within 7 s skip the Stealth requirement. Macros cannot check for that buff, so
+the macro is a cast sequence: the first press casts Ghostly Strike, the next Ambush, and
+after 7 s without a press it starts over at Ghostly Strike. While Ghostly Strike is on
+cooldown, the press does nothing; use WS Backstab. In stealth it is a plain Ambush.
+Ambush and Backstab still need you behind the target. Ghostly Strike goes before the
+swap, so with the sword in it hits for 125% weapon damage instead of the dagger's 180%,
+but it and the swap share one press.
 
 ## Automatic swaps
 
