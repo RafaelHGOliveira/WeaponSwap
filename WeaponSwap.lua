@@ -119,13 +119,29 @@ end
 
 -- Macros -----------------------------------------------------------------------
 
+-- Hemorrhage is a talent: the opener-only WS Backstab strikes with it once it is known.
+local HEMORRHAGE = 16511
+local function knowsSpell(id)
+  if IsPlayerSpell then return IsPlayerSpell(id) end
+  return C_SpellBook and C_SpellBook.IsSpellKnown and C_SpellBook.IsSpellKnown(id)
+end
+
 -- "%s" is the bag slot of the weapon not in the main hand. [equipped:Daggers] tells
 -- the modes apart: the setup is two swords and one dagger.
+-- alt: the body used while option alt.key is ticked. roles names the weapon each
+-- /equipslot puts in, in order (default: fallback); the hand-swap and /ws forms need it.
 local MACROS = {
   -- A failed "/cast Ambush" out of stealth stops the macro on Forever (Rafael, 2026-11-18:
   -- "must be in stealth", no Backstab), so the stealth check is a conditional, not a fallthrough.
   -- Its /startattack is [nostealth]: in stealth an auto attack swing would break it before Ambush.
-  { name = "WS Backstab", body = "#showtooltip\n/equipslot [noequipped:Daggers] 16 %s\n/cast [stealth] Ambush; Backstab", fallback = "dagger", startAttack = "[nostealth]" },
+  -- openerOnly: the dagger only for Ambush. Out of stealth it is Hemorrhage (or Sinister
+  -- Strike) and the sword goes back after it, as in WS Sinister: with a sword of more DPS
+  -- than the dagger, Backstab does less damage per energy than those strikes.
+  { name = "WS Backstab", body = "#showtooltip\n/equipslot [noequipped:Daggers] 16 %s\n/cast [stealth] Ambush; Backstab", fallback = "dagger", startAttack = "[nostealth]",
+    alt = { key = "openerOnly", roles = { "dagger", "sword" }, body = function()
+      return "#showtooltip\n/equipslot [stealth,noequipped:Daggers] 16 %s\n/cast [stealth] Ambush; "
+        .. (knowsSpell(HEMORRHAGE) and "Hemorrhage" or "Sinister Strike") .. "\n/equipslot [nostealth,equipped:Daggers] 16 %s"
+    end } },
   { name = "WS Ambush", body = "#showtooltip Ambush\n/equipslot [noequipped:Daggers] 16 %s\n/cast Ambush", fallback = "dagger", pickPocket = true },
   { name = "WS Sword", body = "/equipslot [equipped:Daggers] 16 %s", fallback = "sword", iconFrom = "sword" },
   { name = "WS Sinister", body = "#showtooltip Sinister Strike\n/cast Sinister Strike\n/equipslot [equipped:Daggers] 16 %s", fallback = "sword", startAttack = true },
@@ -136,7 +152,12 @@ local MACROS = {
   -- Ghostly Strike after 7 s without a press. Ghostly Strike comes before the swap, like
   -- WS Sinister, so it and the swap share a press. In stealth it is a plain Ambush, so its
   -- /startattack is [nostealth], as in WS Backstab.
-  { name = "WS Ghostly", body = "#showtooltip\n/cast [stealth] Ambush\n/castsequence [nostealth] reset=7 Ghostly Strike, Ambush\n/equipslot [noequipped:Daggers] 16 %s", fallback = "dagger", startAttack = "[nostealth]" },
+  -- ghostlyAlone: solo the target faces you, and Ambush needs you behind it even with the
+  -- Ghostly Strike buff, so it is Ghostly Strike alone and the sword back, like WS Sinister.
+  { name = "WS Ghostly", body = "#showtooltip\n/cast [stealth] Ambush\n/castsequence [nostealth] reset=7 Ghostly Strike, Ambush\n/equipslot [noequipped:Daggers] 16 %s", fallback = "dagger", startAttack = "[nostealth]",
+    alt = { key = "ghostlyAlone", roles = { "sword" }, startAttack = true, body = function()
+      return "#showtooltip Ghostly Strike\n/cast Ghostly Strike\n/equipslot [equipped:Daggers] 16 %s"
+    end } },
 }
 
 local function macroIcon(m)
@@ -175,24 +196,32 @@ end
 -- Ambush still needs you behind the target, Pick Pocket does not. [nocombat] skips it
 -- after Vanish, where it fails.
 local function macroBody(m, slot, names)
-  local body = m.body
+  local alt = m.alt and WeaponSwapDB[m.alt.key] and m.alt
+  local body = alt and alt.body() or m.body
+  local roles = alt and alt.roles or { m.fallback }
+  local startAttack = m.startAttack
+  if alt and alt.startAttack ~= nil then startAttack = alt.startAttack end
   if m.pickPocket and WeaponSwapDB.pickPocket then
     body = body:gsub("\n/cast Ambush", "\n/cast [nocombat] Pick Pocket\n/cast Ambush")
   end
   -- Before the /cast: a failed /cast stops the macro, and auto attack should start anyway.
-  if m.startAttack and WeaponSwapDB.startAttack then
-    local cond = m.startAttack == true and "" or " " .. m.startAttack
+  if startAttack and WeaponSwapDB.startAttack then
+    local cond = startAttack == true and "" or " " .. startAttack
     body = body:gsub("\n/cast ", "\n/startattack" .. cond .. "\n/cast ", 1)
   end
-  if slot then return body:format(slot) end
-  -- One weapon per hand: no conditional, since equipping the weapon already in the main
-  -- hand there changes nothing.
-  local name = names and names[m.fallback]
-  if name then
-    return (body:gsub("/equipslot %b[] 16 %%s", function() return "/equipslot 16 " .. name end))
-  end
-  -- No weapon in the bags: /ws works out of combat only.
-  return (body:gsub("/equipslot %b[] 16 %%s", "/ws " .. m.fallback))
+  if slot then return (body:gsub("%%s", slot)) end
+  -- One weapon per hand: [equipped:Daggers] is true in either hand, so it goes; equipping
+  -- the weapon already in the main hand changes nothing. Other conditions ([stealth]) stay.
+  -- No weapon in the bags: /ws, out of combat only, which reads the same conditions.
+  local n = 0
+  return (body:gsub("/equipslot (%b[]) 16 %%s", function(cond)
+    n = n + 1
+    local role = roles[n] or roles[1]
+    cond = cond:gsub("n?o?equipped:Daggers,?", ""):gsub(",%]", "]")
+    cond = cond == "[]" and "" or cond .. " "
+    if names then return "/equipslot " .. cond .. "16 " .. names[role] end
+    return "/ws " .. cond .. role
+  end))
 end
 
 -- Rewrites existing macros whose bag slot changed. Out of combat only.
@@ -243,6 +272,8 @@ local window, slots, checks
 -- and by settle().
 local function daggerIfStealthed() return IsStealthed() and "dagger" or nil end
 local function swordIfNotStealthed() return not IsStealthed() and "sword" or nil end
+local adoptSword -- defined below setRole
+-- Options added after 1.3.1 are off until ticked, so an update keeps the old behaviour.
 local OPTIONS = {
   { key = "stealthDagger", label = "Dagger when entering stealth", now = daggerIfStealthed },
   { key = "swordLeaveStealth", label = "Sword when leaving stealth", now = swordIfNotStealthed },
@@ -250,6 +281,9 @@ local OPTIONS = {
   { key = "swordAfterOpener", label = "Sword after the opener" },
   { key = "pickPocket", label = "Pick Pocket before Ambush", macros = true },
   { key = "startAttack", label = "/startattack in the strike macros", macros = true },
+  { key = "openerOnly", label = "WS Backstab: dagger for Ambush only, sword strike after", macros = true },
+  { key = "ghostlyAlone", label = "WS Ghostly: Ghostly Strike alone, no dagger", macros = true },
+  { key = "adoptSword", label = "A sword you equip by hand becomes the sword", onTick = function() adoptSword() end },
   { key = "debug", label = "Debug log (/reload saves it)", clearLog = true },
 }
 
@@ -295,6 +329,20 @@ local function setRole(role, id)
   updateMacros()
 end
 
+-- A one-hand weapon other than a dagger put in the main hand, not by WeaponSwap (its
+-- swaps only put the saved weapons there), becomes the sword. 2 = weapon, 15 = dagger.
+local GetItemInfoInstant = GetItemInfoInstant or C_Item.GetItemInfoInstant
+local ONE_HAND = { INVTYPE_WEAPON = true, INVTYPE_WEAPONMAINHAND = true }
+function adoptSword()
+  local id = GetInventoryItemID("player", MAIN_HAND)
+  if not WeaponSwapDB.adoptSword or not id or id == WeaponSwapDB.dagger or id == WeaponSwapDB.sword then return end
+  local _, _, _, equipLoc, _, classID, subclassID = GetItemInfoInstant(id)
+  if classID == 2 and subclassID ~= 15 and ONE_HAND[equipLoc] then
+    log("adoptSword %s", tostring(id))
+    setRole("sword", id)
+  end
+end
+
 local function dropOnSlot(button)
   local kind, id = GetCursorInfo()
   if kind == "item" then
@@ -306,7 +354,7 @@ end
 
 local function buildWindow()
   window = CreateFrame("Frame", "WeaponSwapFrame", UIParent, "BasicFrameTemplateWithInset")
-  window:SetSize(360, 340)
+  window:SetSize(360, 412)
   window:SetPoint("CENTER")
   window:Hide() -- frames start shown; /ws toggles it right after building
   window:SetMovable(true)
@@ -398,6 +446,7 @@ local function buildWindow()
       WeaponSwapDB[opt.key] = self:GetChecked() and true or nil
       if opt.clearLog and WeaponSwapDB[opt.key] then WeaponSwapDB.log = {} end
       if opt.macros then updateMacros() end
+      if opt.onTick and WeaponSwapDB[opt.key] then opt.onTick() end
       local role = opt.now and WeaponSwapDB[opt.key] and opt.now()
       if role then autoEquip(role) end
     end)
@@ -496,6 +545,11 @@ SLASH_WEAPONSWAP2 = "/WS"
 SLASH_WEAPONSWAP3 = "/Ws"
 SLASH_WEAPONSWAP4 = "/wS"
 SlashCmdList.WEAPONSWAP = function(input)
+  -- Macro conditions, as in "/ws [stealth] dagger" (the /ws form of a macro): none true, nothing.
+  if input:find("^%s*%[") then
+    input = SecureCmdOptionParse(input)
+    if not input or input == "" then return end
+  end
   local cmd = input:match("^%s*(%S*)"):lower()
   if cmd == "dagger" or cmd == "sword" then
     equip(cmd)
@@ -525,6 +579,7 @@ events:RegisterEvent("PLAYER_EQUIPMENT_CHANGED") -- a weapon moved to or from th
 events:RegisterEvent("PLAYER_ENTERING_WORLD") -- login, /reload, loading screens
 events:RegisterEvent("PLAYER_ALIVE") -- resurrected without releasing
 events:RegisterEvent("PLAYER_UNGHOST") -- back from ghost
+events:RegisterEvent("SPELLS_CHANGED") -- Hemorrhage learned: the opener-only WS Backstab uses it
 events:SetScript("OnEvent", function(_, event, arg1, _, spellID)
   if event == "ADDON_LOADED" then
     if arg1 == "WeaponSwap" then
@@ -546,7 +601,10 @@ events:SetScript("OnEvent", function(_, event, arg1, _, spellID)
       autoEquip("sword")
     end
   elseif event == "BAG_UPDATE_DELAYED" or event == "PLAYER_EQUIPMENT_CHANGED" then
+    if event == "PLAYER_EQUIPMENT_CHANGED" and arg1 == MAIN_HAND then adoptSword() end
     updateMacros()
+  elseif event == "SPELLS_CHANGED" then
+    if WeaponSwapDB.openerOnly then updateMacros() end
   elseif event == "GET_ITEM_INFO_RECEIVED" then
     -- The hand-swap macros need the item names.
     if arg1 == WeaponSwapDB.dagger or arg1 == WeaponSwapDB.sword then updateMacros() end

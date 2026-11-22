@@ -8,6 +8,7 @@ On WoW Forever, Backstab and Ambush need a dagger in the main hand. Rogue Weapon
 
 - **Opener macros:** WS Backstab and WS Ambush put the dagger in, then strike. WS Ghostly opens out of stealth with Ghostly Strike, then Ambush.
 - **Swap back on the hit:** WS Sinister, WS Hemorrhage and WS Slice use Sinister Strike, Hemorrhage or Slice and Dice and put the sword back on the same press. One checkbox adds `/startattack` to WS Sinister, WS Hemorrhage and, out of stealth, WS Backstab and WS Ghostly.
+- **For a sword better than the dagger:** three options, off by default. WS Backstab uses the dagger only for Ambush and strikes with the sword after (Hemorrhage, or Sinister Strike before you learn it). WS Ghostly becomes Ghostly Strike alone, for solo play where the target faces you and Ambush cannot land. And a sword you equip by hand becomes the saved sword.
 - **Works in combat:** the macros use the game's own `/equipslot`, which Forever allows in combat.
 - **Automatic swaps out of combat:** dagger when you stealth, sword after the opener, when stealth drops, or when the fight ends. Each one is a checkbox.
 - **Two identical swords:** a main-hand and an off-hand copy of the same sword are fine. The macros pick the copy in your bags, never the one in your off hand.

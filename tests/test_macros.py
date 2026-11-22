@@ -25,7 +25,8 @@ format, tinsert, tremove, strmatch = string.format, table.insert, table.remove, 
 date = os.date
 function GetTime() return 0 end
 NUM_BAG_SLOTS = 4
-state = { bags = {}, inv = {}, combat = false, stealth = false, macros = {}, picked = {}, names = {} }
+state = { bags = {}, inv = {}, combat = false, stealth = false, macros = {}, picked = {}, names = {}, spells = {}, instant = {} }
+function IsPlayerSpell(id) return state.spells[id] or false end
 function InCombatLockdown() return state.combat end
 function IsStealthed() return state.stealth end
 function CursorHasItem() return false end
@@ -46,6 +47,10 @@ C_Item = {
   GetItemInfo = function(id) return state.names[id] end,
   GetItemIconByID = function(id) return "icon" .. id end,
   EquipItemByName = function() end,
+  GetItemInfoInstant = function(id)
+    local t = state.instant[id]
+    if t then return id, nil, nil, t[1], nil, 2, t[2] end
+  end,
 }
 C_Spell = { GetSpellInfo = function(id) return { name = "spell" .. id } end }
 function GetMacroIndexByName(name) return 1 end
@@ -85,7 +90,7 @@ def run(title, bags, inv, names=True, opts=()):
     st.bags = lua.table_from(bags)
     st.inv = lua.table_from(inv)
     st.names = lua.table_from({DAGGER: "Edward's Knife", SWORD: "Vileblood Scimitar of the 100% Monkey"} if names else {})
-    for k in ("pickPocket", "startAttack"):
+    for k in ("pickPocket", "startAttack", "openerOnly", "ghostlyAlone"):
         g.WeaponSwapDB[k] = True if k in opts else None
     g.edited = lua.table()
     on_event(None, "BAG_UPDATE_DELAYED")
@@ -134,6 +139,55 @@ assert g.edited["WS Ambush"].startswith("#showtooltip Ambush\n/equipslot 16 Edwa
 
 none = run("nothing in bags, dagger not equipped: /ws fallback", {}, {16: SWORD})
 assert "/ws dagger" in none["WS Ambush"]
+
+# Defaults are the 1.3.1 bodies: the new options are off until ticked.
+assert bag_sword["WS Backstab"] == "#showtooltip\n/equipslot [noequipped:Daggers] 16 0 7\n/cast [stealth] Ambush; Backstab"
+assert bag_sword["WS Ghostly"] == "#showtooltip\n/cast [stealth] Ambush\n/castsequence [nostealth] reset=7 Ghostly Strike, Ambush\n/equipslot [noequipped:Daggers] 16 0 7"
+assert hand["WS Backstab"] == "#showtooltip\n/equipslot 16 Edward's Knife\n/startattack [nostealth]\n/cast [stealth] Ambush; Backstab"
+assert none["WS Backstab"] == "#showtooltip\n/ws dagger\n/cast [stealth] Ambush; Backstab"
+
+# openerOnly: dagger in stealth for Ambush, a sword strike out of stealth and the sword back.
+op = run("openerOnly, bag mode, no Hemorrhage", {"0 7": DAGGER}, {16: SWORD, 17: SWORD}, opts=("openerOnly", "startAttack"))
+assert op["WS Backstab"] == ("#showtooltip\n/equipslot [stealth,noequipped:Daggers] 16 0 7\n/startattack [nostealth]\n"
+                             "/cast [stealth] Ambush; Sinister Strike\n/equipslot [nostealth,equipped:Daggers] 16 0 7")
+assert op["WS Ghostly"] == bag_sword["WS Ghostly"].replace("\n/cast", "\n/startattack [nostealth]\n/cast", 1), "openerOnly leaves WS Ghostly alone"
+g.state.spells = lua.table_from({16511: True})  # Hemorrhage learned: SPELLS_CHANGED rewrites it
+g.edited = lua.table()
+on_event(None, "SPELLS_CHANGED")
+assert "/cast [stealth] Ambush; Hemorrhage\n" in g.edited["WS Backstab"]
+oph = run("openerOnly, hand mode", {}, {16: SWORD, 17: DAGGER}, opts=("openerOnly",))
+assert oph["WS Backstab"] == ("#showtooltip\n/equipslot [stealth] 16 Edward's Knife\n/cast [stealth] Ambush; Hemorrhage\n"
+                              "/equipslot [nostealth] 16 Vileblood Scimitar of the 100% Monkey")
+opn = run("openerOnly, /ws fallback", {}, {16: SWORD}, opts=("openerOnly",))
+assert opn["WS Backstab"] == "#showtooltip\n/ws [stealth] dagger\n/cast [stealth] Ambush; Hemorrhage\n/ws [nostealth] sword"
+g.state.spells = lua.table()
+
+# ghostlyAlone: the 1553d96 body, Ghostly Strike alone and the sword back.
+gh = run("ghostlyAlone, bag mode", {"0 7": DAGGER}, {16: SWORD, 17: SWORD}, opts=("ghostlyAlone", "startAttack"))
+assert gh["WS Ghostly"] == "#showtooltip Ghostly Strike\n/startattack\n/cast Ghostly Strike\n/equipslot [equipped:Daggers] 16 0 7"
+ghh = run("ghostlyAlone, hand mode", {}, {16: SWORD, 17: DAGGER}, opts=("ghostlyAlone", "startAttack"))
+assert ghh["WS Ghostly"] == "#showtooltip Ghostly Strike\n/startattack\n/cast Ghostly Strike\n/equipslot 16 Vileblood Scimitar of the 100% Monkey"
+assert ghh["WS Backstab"] == hand["WS Backstab"], "ghostlyAlone leaves WS Backstab alone"
+
+# adoptSword: a one-hand non-dagger weapon equipped by hand becomes the sword.
+NEW, AXE2H, DAGGER2 = 300, 301, 302
+g.state.instant = lua.table_from({NEW: lua.table_from(["INVTYPE_WEAPONMAINHAND", 7]),
+                                  AXE2H: lua.table_from(["INVTYPE_2HWEAPON", 1]),
+                                  DAGGER2: lua.table_from(["INVTYPE_WEAPON", 15])})
+g.state.inv = lua.table_from({16: NEW})
+on_event(None, "PLAYER_EQUIPMENT_CHANGED", 16)
+assert g.WeaponSwapDB.sword == SWORD, "off by default"
+g.WeaponSwapDB.adoptSword = True
+for other in (AXE2H, DAGGER2):
+    g.state.inv = lua.table_from({16: other})
+    on_event(None, "PLAYER_EQUIPMENT_CHANGED", 16)
+    assert g.WeaponSwapDB.sword == SWORD, other
+g.state.inv = lua.table_from({16: NEW})
+on_event(None, "PLAYER_EQUIPMENT_CHANGED", 17)
+assert g.WeaponSwapDB.sword == SWORD, "off hand ignored"
+on_event(None, "PLAYER_EQUIPMENT_CHANGED", 16)
+assert g.WeaponSwapDB.sword == NEW
+g.WeaponSwapDB.sword, g.WeaponSwapDB.adoptSword = SWORD, None
 
 # Out-of-combat automatic swap: stealth with the dagger in the off hand.
 g.WeaponSwapDB.stealthDagger = True

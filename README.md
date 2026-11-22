@@ -53,6 +53,9 @@ with the CurseForge app, or by hand:
 │ ☑ Sword after the opener                    │
 │ ☐ Pick Pocket before Ambush                 │
 │ ☐ /startattack in the strike macros         │
+│ ☐ WS Backstab: dagger for Ambush only, ...  │
+│ ☐ WS Ghostly: Ghostly Strike alone, ...     │
+│ ☐ A sword you equip by hand becomes the ... │
 │ ☐ Debug log (/reload saves it)              │
 └─────────────────────────────────────────────┘
 ```
@@ -103,6 +106,21 @@ Ambush and Backstab still need you behind the target. Ghostly Strike goes before
 swap, so with the sword in it hits for 125% weapon damage instead of the dagger's 180%,
 but it and the swap share one press.
 
+## Options for a sword better than the dagger
+
+Off by default, so an update keeps the macros as they were.
+
+- **WS Backstab: dagger for Ambush only, sword strike after.** In stealth, WS Backstab
+  puts the dagger in and casts Ambush. Out of stealth it casts Hemorrhage (Sinister
+  Strike until you learn it) and puts the sword back, like WS Sinister. Backstab costs 60
+  energy for one combo point; with a sword of more DPS than the dagger, Sinister Strike
+  and Hemorrhage do more damage per energy and give combo points faster.
+- **WS Ghostly: Ghostly Strike alone, no dagger.** Ghostly Strike lets Ambush skip
+  Stealth, not the need to be behind the target. Solo the target faces you, so the
+  Ambush rarely lands. With this ticked, WS Ghostly is Ghostly Strike and the sword back.
+- **A sword you equip by hand becomes the sword.** Equip a new one-hand weapon that is
+  not a dagger in the main hand (from the character sheet or the bags) and WeaponSwap
+  saves it as the sword, with a line in chat. Two-handers and the off hand are ignored.
 ## Automatic swaps
 
 | Option | Swaps when |
