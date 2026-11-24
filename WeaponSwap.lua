@@ -129,7 +129,10 @@ local MACROS = {
   { name = "WS Backstab", body = "#showtooltip\n/equipslot [noequipped:Daggers] 16 %s\n/cast [stealth] Ambush; Backstab", fallback = "dagger", startAttack = "[nostealth]" },
   { name = "WS Ambush", body = "#showtooltip Ambush\n/equipslot [noequipped:Daggers] 16 %s\n/cast Ambush", fallback = "dagger", pickPocket = true },
   { name = "WS Sword", body = "/equipslot [equipped:Daggers] 16 %s", fallback = "sword", iconFrom = "sword" },
-  { name = "WS Sinister", body = "#showtooltip Sinister Strike\n/cast Sinister Strike\n/equipslot [equipped:Daggers] 16 %s", fallback = "sword", startAttack = true },
+  -- riposte: "/cast Riposte" goes first (asked by a CurseForge user, 2026-11-24). Not confirmed
+  -- in game: if a failed /cast stops the macro here too, Riposte not lit up would stop
+  -- Sinister Strike and the swap on that press.
+  { name = "WS Sinister", body = "#showtooltip Sinister Strike\n/cast Sinister Strike\n/equipslot [equipped:Daggers] 16 %s", fallback = "sword", startAttack = true, riposte = true },
   { name = "WS Hemorrhage", body = "#showtooltip Hemorrhage\n/cast Hemorrhage\n/equipslot [equipped:Daggers] 16 %s", fallback = "sword", startAttack = true },
   { name = "WS Slice", body = "#showtooltip Slice and Dice\n/cast Slice and Dice\n/equipslot [equipped:Daggers] 16 %s", fallback = "sword" },
   -- Out of stealth: Ghostly Strike lets the next Ambush skip Stealth (7 s). Macro conditionals
@@ -184,6 +187,9 @@ local function macroBody(m, slot, names)
   local body, startAttack = m.body, m.startAttack
   if m.pickPocket and WeaponSwapDB.pickPocket then
     body = body:gsub("\n/cast Ambush", "\n/cast [nocombat] Pick Pocket\n/cast Ambush")
+  end
+  if m.riposte and WeaponSwapDB.riposte then
+    body = body:gsub("\n/cast Sinister Strike", "\n/cast Riposte\n/cast Sinister Strike")
   end
   -- Before the /cast: a failed /cast stops the macro, and auto attack should start anyway.
   if startAttack and WeaponSwapDB.startAttack then
@@ -259,6 +265,7 @@ local OPTIONS = {
   { key = "pickPocket", label = "Pick Pocket before Ambush", macros = true },
   { key = "startAttack", label = "/startattack in the strike macros", macros = true },
   { key = "ghostlyAlone", label = "WS Ghostly: Ghostly Strike alone, no dagger", macros = true },
+  { key = "riposte", label = "WS Sinister: Riposte first", macros = true },
   { key = "adoptSword", label = "A sword you equip by hand becomes the sword", onTick = function() adoptSword() end },
   { key = "debug", label = "Debug log (/reload saves it)", clearLog = true },
 }
@@ -330,7 +337,7 @@ end
 
 local function buildWindow()
   window = CreateFrame("Frame", "WeaponSwapFrame", UIParent, "BasicFrameTemplateWithInset")
-  window:SetSize(360, 388)
+  window:SetSize(360, 412)
   window:SetPoint("CENTER")
   window:Hide() -- frames start shown; /ws toggles it right after building
   window:SetMovable(true)

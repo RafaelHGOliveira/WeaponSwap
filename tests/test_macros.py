@@ -89,7 +89,7 @@ def run(title, bags, inv, names=True, opts=()):
     st.bags = lua.table_from(bags)
     st.inv = lua.table_from(inv)
     st.names = lua.table_from({DAGGER: "Edward's Knife", SWORD: "Vileblood Scimitar of the 100% Monkey"} if names else {})
-    for k in ("pickPocket", "startAttack", "ghostlyAlone"):
+    for k in ("pickPocket", "startAttack", "ghostlyAlone", "riposte"):
         g.WeaponSwapDB[k] = True if k in opts else None
     g.edited = lua.table()
     on_event(None, "BAG_UPDATE_DELAYED")
@@ -151,6 +151,14 @@ assert gh["WS Ghostly"] == "#showtooltip Ghostly Strike\n/startattack\n/cast Gho
 ghh = run("ghostlyAlone, hand mode", {}, {16: SWORD, 17: DAGGER}, opts=("ghostlyAlone", "startAttack"))
 assert ghh["WS Ghostly"] == "#showtooltip Ghostly Strike\n/startattack\n/cast Ghostly Strike\n/equipslot 16 Vileblood Scimitar of the 100% Monkey"
 assert ghh["WS Backstab"] == hand["WS Backstab"], "ghostlyAlone leaves WS Backstab alone"
+
+# riposte: Riposte before Sinister Strike, WS Sinister only; default body unchanged.
+assert bag_sword["WS Sinister"] == "#showtooltip Sinister Strike\n/cast Sinister Strike\n/equipslot [equipped:Daggers] 16 0 7"
+rb = run("riposte, bag mode", {"0 7": DAGGER}, {16: SWORD, 17: SWORD}, opts=("riposte",))
+assert rb["WS Sinister"] == "#showtooltip Sinister Strike\n/cast Riposte\n/cast Sinister Strike\n/equipslot [equipped:Daggers] 16 0 7"
+assert {n: b for n, b in rb.items() if n != "WS Sinister"} == {n: b for n, b in bag_sword.items() if n != "WS Sinister"}
+rh = run("riposte + startAttack, hand mode", {}, {16: SWORD, 17: DAGGER}, opts=("riposte", "startAttack"))
+assert rh["WS Sinister"] == "#showtooltip Sinister Strike\n/startattack\n/cast Riposte\n/cast Sinister Strike\n/equipslot 16 Vileblood Scimitar of the 100% Monkey"
 
 # adoptSword: a one-hand non-dagger weapon equipped by hand becomes the sword.
 NEW, AXE2H, DAGGER2 = 300, 301, 302

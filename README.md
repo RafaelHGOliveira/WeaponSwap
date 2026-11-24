@@ -54,6 +54,7 @@ with the CurseForge app, or by hand:
 │ ☐ Pick Pocket before Ambush                 │
 │ ☐ /startattack in the strike macros         │
 │ ☐ WS Ghostly: Ghostly Strike alone, ...     │
+│ ☐ WS Sinister: Riposte first                │
 │ ☐ A sword you equip by hand becomes the ... │
 │ ☐ Debug log (/reload saves it)              │
 └─────────────────────────────────────────────┘
@@ -105,9 +106,14 @@ Ambush and Backstab still need you behind the target. Ghostly Strike goes before
 swap, so with the sword in it hits for 125% weapon damage instead of the dagger's 180%,
 but it and the swap share one press.
 
-## Two more options
+## More options
 
 Off by default, so an update keeps the macros as they were.
+
+- **WS Sinister: Riposte first.** WS Sinister casts Riposte (Combat talent, lit up after
+  you parry) before Sinister Strike. Not yet confirmed in game: since a failed `/cast`
+  stops the macro on Forever, a press while Riposte is not lit up may stop Sinister Strike
+  and the swap too. If it does, leave this off.
 
 - **WS Ghostly: Ghostly Strike alone, no dagger.** Ghostly Strike lets Ambush skip
   Stealth, not the need to be behind the target. Solo the target faces you, so the
