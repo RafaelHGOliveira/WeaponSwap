@@ -17,7 +17,7 @@ in game.
 
 ## Release
 
-`pwsh -File release.ps1 <version> <changelog.md>`. It runs the test, bumps the `.toc`,
+`pwsh -NoProfile -File release.ps1 <version> <changelog.md>`. It runs the test, bumps the `.toc`,
 commits "Release X", tags, pushes, uploads the `git archive` zip to CurseForge and copies
 the files into the game. Before running anything heavy, check that the game is not
 running (see the global instructions).
